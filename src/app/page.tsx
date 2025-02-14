@@ -2,19 +2,12 @@
 import React, { useEffect, useLayoutEffect, useRef } from "react";
 import styles from "./Home.module.scss";
 import clsx from "clsx";
-type Frame = {
-  id: number;
-  content?: number | string;
-  src?:string;
-  position?: string;
-  background?: boolean;
-  text: boolean;
-};
+import items from "./data"
 export default function Home() {
   const framesRef = useRef<HTMLDivElement[]>([]); // Ссылки на элементы
 
   useLayoutEffect(() => {
-    const zSpacing = -1000; // Расстояние между слоями
+    const zSpacing = -1500; // Расстояние между слоями
     let lastScrollTop = 0; // Предыдущее положение скролла
 
     const zVals = framesRef.current.map((_, i) => i * zSpacing); // Изначальные позиции по Z
@@ -39,13 +32,7 @@ export default function Home() {
     
   }, []);
 
-  const items:Frame[] = [
-    { id: 1, content: "Первый слой", position: "right", src: "/1.mp4", text: true, },
-    { id: 2, content: "d слой", position: "left",  text: false, src: "/3.mp4", background: true,},
-    { id: 3, content: "Первый слой", position: "right", src: "/2.mp4", text: true, },
-
-    
-  ];
+ 
 
   return (
     <div className={styles.container}>
@@ -63,15 +50,26 @@ export default function Home() {
               if (el) framesRef.current[index] = el;
             }}
           >
-            <div className={styles.frame__content}>
+            
             {item.text ? (
-              <div>{item.content}</div>
+              <div className={clsx(
+                styles.frame_media, 
+                { 
+                  [styles.vertical]: item.type === "vertical",
+                  [styles.horizontal]: item.type === "horizontal",
+                  [styles.frame_media_left]: item.position === "left", 
+                  [styles.frame_media_right]: item.position === "right" 
+                }
+              )} >
+                <div className={styles.text}><p>{item.content}</p></div>
+                </div>
             ) : (
             <video 
               className={clsx(
-                styles.frame__media, 
+                styles.frame_media, 
                 { 
-                 
+                  [styles.vertical]: item.type === "vertical",
+                  [styles.horizontal]: item.type === "horizontal",
                   [styles.frame_media_left]: item.position === "left", 
                   [styles.frame_media_right]: item.position === "right" 
                 }
@@ -84,7 +82,7 @@ export default function Home() {
               
             )}
             </div>
-          </div>
+         
         ))}
       </section>
     </div>
