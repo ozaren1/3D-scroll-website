@@ -1,0 +1,84 @@
+.process {
+  padding: var(--section-gap) var(--margin);
+}
+
+.index {
+  font-size: var(--step-small);
+  color: var(--cyan);
+}
+
+.title {
+  margin-top: 12px;
+  font-size: var(--step-head);
+  color: var(--yellow);
+}
+
+.track {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 56px;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-top: 0;
+
+    &:nth-child(2) .bar {
+      --fill: 0.7;
+    }
+
+    &:nth-child(3) .bar {
+      --fill: 0.45;
+    }
+
+    &:nth-child(4) .bar {
+      --fill: 0.25;
+    }
+  }
+}
+
+// A dotted clip on the timeline: denser where the work is heavier.
+.bar {
+  --fill: 1;
+  display: block;
+  height: 44px;
+  background:
+    radial-gradient(var(--yellow) 1.6px, transparent 2px) 0 0 / 7px 7px,
+    var(--panel);
+  opacity: calc(0.35 + var(--fill) * 0.65);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  transform-origin: left;
+  transition: transform 0.9s var(--ease-out);
+
+  :global(.js-reveal) li:not(:global(.is-visible)) & {
+    transform: scaleX(0.05);
+  }
+}
+
+.stepTitle {
+  font-family: var(--font-d);
+  font-size: var(--step-lead);
+  font-weight: 700;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.time {
+  color: var(--cyan);
+}
+
+@media (max-width: 900px) {
+  .track {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px 8px;
+  }
+}
+
+@media (max-width: 520px) {
+  .track {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,80 @@
+// A yellow field to close the page, the theme's loudest colour used once.
+.footer {
+  padding: 72px var(--margin) var(--margin);
+  background: var(--yellow);
+  color: var(--bg);
+  overflow: hidden;
+  clip-path: polygon(0 40px, 40px 0, 100% 0, 100% 100%, 0 100%);
+}
+
+// Cyan focus rings vanish on yellow; use the ink instead.
+.footer :focus-visible {
+  outline-color: var(--bg);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 5fr 2fr 3fr;
+  gap: var(--margin);
+}
+
+.places {
+  list-style: none;
+  font-family: var(--font-d);
+  font-size: clamp(1.25rem, 1rem + 1vw, 2rem);
+  font-weight: 700;
+  line-height: 1.25;
+  text-transform: uppercase;
+
+  a {
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+
+  a {
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.where {
+  font-weight: 600;
+}
+
+.name {
+  margin-top: 56px;
+  font-size: 13.8vw;
+  white-space: nowrap;
+  letter-spacing: -0.04em;
+}
+
+.legal {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 16px;
+  font-size: var(--step-small);
+}
+
+@media (max-width: 900px) {
+  .row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .places {
+    grid-column: 1 / -1;
+  }
+}

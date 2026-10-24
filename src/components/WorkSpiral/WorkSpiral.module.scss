@@ -1,0 +1,205 @@
+// The pinned run: about four screens while the helix makes its turns.
+.work {
+  position: relative;
+  height: 420svh;
+}
+
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  overflow: clip; // not scrollable at all, so keyboard focus cannot shift the stage
+  display: grid;
+  place-items: center;
+}
+
+// Heading above the centre line and the front card below it, so the pair sits centred on screen.
+.center {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  pointer-events: none;
+  transform: translateY(-22svh);
+}
+
+.title {
+  font-size: var(--step-head);
+  color: var(--yellow);
+}
+
+.line {
+  margin-top: 14px;
+  font-family: var(--font-d);
+  font-size: clamp(1.5rem, 1rem + 1.8vw, 2.75rem);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.count {
+  margin-top: 16px;
+  font-size: var(--step-small);
+  color: var(--muted);
+}
+
+.space {
+  position: absolute;
+  inset: 0;
+  perspective: 1500px;
+  perspective-origin: 50% 50%;
+}
+
+.helix {
+  --r: min(620px, 42vw);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.card {
+  --w: clamp(200px, 21vw, 330px);
+  position: absolute;
+  left: calc(var(--w) / -2);
+  top: calc(var(--w) * -0.3);
+  width: var(--w);
+  aspect-ratio: 16 / 10;
+  padding: 0;
+  border: 0;
+  background: var(--panel);
+  cursor: pointer;
+  transform: translateY(calc(var(--i) * var(--rise, 16vh))) rotateY(var(--angle)) translateZ(var(--r));
+  backface-visibility: hidden;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  transition: filter 0.3s ease;
+
+  img,
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 0 2px rgba(252, 238, 10, 0.55);
+    clip-path: inherit;
+    pointer-events: none;
+  }
+
+  &:hover,
+  &:focus-visible {
+    filter: brightness(1.15) saturate(1.2);
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  &:focus-visible::after {
+    box-shadow: inset 0 0 0 4px var(--cyan);
+  }
+}
+
+.vertical {
+  aspect-ratio: 9 / 13;
+  top: calc(var(--w) * -0.7);
+}
+
+.cardMeta {
+  position: absolute;
+  left: 10px;
+  bottom: 8px;
+  padding: 2px 6px;
+  background: rgba(10, 10, 12, 0.8);
+  color: var(--yellow);
+  font-size: 12px;
+}
+
+.caption {
+  position: absolute;
+  left: var(--margin);
+  bottom: var(--margin);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 280px;
+  padding: 16px 22px;
+
+  strong {
+    font-family: var(--font-d);
+    font-size: var(--step-lead);
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+}
+
+.captionMeta {
+  font-size: var(--step-small);
+  color: var(--cyan);
+}
+
+@media (max-width: 700px) {
+  .helix {
+    --r: 46vw;
+  }
+
+  .card {
+    --w: 44vw;
+  }
+
+  .caption {
+    right: var(--margin);
+    min-width: 0;
+  }
+}
+
+// Reduced motion: no helix, the works are a plain grid.
+.flat {
+  height: auto;
+  padding: var(--section-gap) var(--margin);
+
+  .stage {
+    position: static;
+    height: auto;
+    overflow: visible;
+    display: block;
+  }
+
+  .space {
+    position: static;
+    perspective: none;
+    margin-top: 48px;
+  }
+
+  .helix {
+    position: static;
+    width: auto;
+    height: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--margin);
+  }
+
+  .card {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: auto;
+    transform: none;
+
+    &[aria-hidden] {
+      display: none;
+    }
+  }
+
+  .caption {
+    display: none;
+  }
+}

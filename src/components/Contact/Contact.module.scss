@@ -1,0 +1,172 @@
+.contact {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  align-items: center;
+  gap: var(--margin);
+  padding: var(--section-gap) var(--margin);
+}
+
+.index {
+  font-size: var(--step-small);
+  color: var(--cyan);
+}
+
+.title {
+  margin-top: 12px;
+  font-size: var(--step-head);
+}
+
+.note {
+  margin-top: 24px;
+  max-width: 36ch;
+  font-size: var(--step-lead);
+  line-height: 1.35;
+}
+
+.direct {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 28px;
+
+  a {
+    padding: 10px 16px;
+    background: var(--panel);
+    box-shadow: inset 0 0 0 1px var(--line);
+    font-weight: 600;
+    text-decoration: none;
+    transition:
+      color 0.2s ease,
+      box-shadow 0.2s ease;
+
+    &:hover {
+      color: var(--yellow);
+      box-shadow: inset 0 0 0 1px var(--yellow);
+    }
+  }
+}
+
+.card {
+  padding: 32px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    span {
+      font-family: var(--font-h);
+      font-size: var(--step-small);
+      color: var(--cyan);
+      text-transform: uppercase;
+    }
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    min-height: 50px;
+    padding: 12px 14px;
+    border: 0;
+    border-bottom: 2px solid var(--line);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--ink);
+    transition:
+      border-color 0.2s ease,
+      background-color 0.2s ease;
+
+    &:hover {
+      border-color: rgba(252, 238, 10, 0.5);
+    }
+
+    &:focus-visible {
+      outline: none;
+      border-color: var(--yellow);
+      background: rgba(252, 238, 10, 0.06);
+    }
+  }
+
+  select option {
+    background: var(--panel);
+  }
+
+  textarea {
+    resize: vertical;
+  }
+}
+
+// The consent checkbox: a plain row, unlike the stacked fields above.
+.form .consent {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+
+  input {
+    flex: none;
+    width: 22px;
+    min-height: 0;
+    height: 22px;
+    margin-top: 1px;
+    padding: 0;
+    accent-color: var(--yellow);
+  }
+
+  span {
+    font-family: var(--font-t);
+    font-size: var(--step-small);
+    color: var(--ink);
+    text-transform: none;
+  }
+
+  a {
+    color: var(--cyan);
+  }
+}
+
+.trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.submit {
+  margin-top: 8px;
+  width: 100%;
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: progress;
+  }
+}
+
+.error {
+  color: var(--red);
+  font-size: var(--step-small);
+}
+
+.sent {
+  padding: 20px;
+  background: rgba(0, 240, 255, 0.08);
+  box-shadow: inset 0 0 0 1px var(--cyan);
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .contact {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: 22px;
+  }
+}

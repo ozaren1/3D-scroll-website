@@ -1,0 +1,40 @@
+.wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.35;
+  filter: grayscale(1) contrast(1.2);
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+
+  &[data-fallback] {
+    display: none;
+  }
+}
+
+// The poster only shows when WebGL is unavailable.
+.wrap:has(.canvas:not([data-fallback])) .poster {
+  display: none;
+}
+
+.source {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}

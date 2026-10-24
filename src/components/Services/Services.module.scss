@@ -1,0 +1,176 @@
+.services {
+  padding: var(--section-gap) var(--margin);
+}
+
+.index {
+  font-size: var(--step-small);
+  color: var(--cyan);
+}
+
+.title {
+  margin-top: 12px;
+  font-size: var(--step-head);
+  color: var(--yellow);
+}
+
+.grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--margin);
+  margin-top: 56px;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tilt {
+  flex: 1;
+}
+
+// The example work under each card.
+.example {
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 12px;
+  background: var(--panel);
+  box-shadow: inset 2px 0 0 var(--cyan);
+}
+
+.exampleMedia {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  padding: 0;
+  border: 0;
+  background: var(--panel-2);
+  cursor: pointer;
+  overflow: hidden;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+
+  img,
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  &:hover img,
+  &:hover video,
+  &:focus-visible img {
+    transform: scale(1.08);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 3px var(--cyan);
+  }
+}
+
+.play {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  background: var(--yellow);
+  color: var(--bg);
+  font-size: 11px;
+}
+
+.exampleText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+
+  strong {
+    font-family: var(--font-d);
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1.1;
+  }
+}
+
+.exampleLabel {
+  font-size: 12px;
+  color: var(--cyan);
+}
+
+.more {
+  margin-top: 4px;
+  font-size: var(--step-small);
+  color: var(--muted);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--yellow);
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  min-height: 300px;
+  padding: 28px;
+  background: var(--panel);
+  transform-style: preserve-3d;
+  clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, var(--cut) 100%, 0 calc(100% - var(--cut)));
+  box-shadow: inset 0 2px 0 var(--yellow);
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background: var(--panel-2);
+  }
+}
+
+.cardTitle {
+  font-family: var(--font-d);
+  font-size: var(--step-lead);
+  font-weight: 700;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.cardText {
+  color: rgba(241, 241, 234, 0.82);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+
+  span {
+    padding: 4px 10px;
+    background: rgba(0, 240, 255, 0.1);
+    color: var(--cyan);
+    font-size: var(--step-small);
+  }
+}
+
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    min-height: 0;
+  }
+}

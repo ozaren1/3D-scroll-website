@@ -1,0 +1,54 @@
+.container {
+  perspective: 1000px;
+}
+
+.card {
+  --rx: 0deg;
+  --ry: 0deg;
+  position: relative;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform 0.5s var(--ease-out);
+
+  &[data-active] {
+    transition: transform 0.12s linear;
+  }
+}
+
+.item {
+  transform: translateZ(0);
+  transition: transform 0.5s var(--ease-out);
+
+  .card[data-active] & {
+    transform: translateZ(var(--z));
+  }
+}
+
+.shine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    420px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 255, 255, 0.16),
+    transparent 60%
+  );
+  transition: opacity 0.4s ease;
+
+  .card[data-active] & {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transform: none;
+  }
+
+  .card[data-active] .item {
+    transform: none;
+  }
+}
