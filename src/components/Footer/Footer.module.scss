@@ -19,12 +19,16 @@
 }
 
 .places {
-  list-style: none;
+  font-style: normal;
   font-family: var(--font-d);
   font-size: clamp(1.25rem, 1rem + 1vw, 2rem);
   font-weight: 700;
   line-height: 1.25;
   text-transform: uppercase;
+
+  ul {
+    list-style: none;
+  }
 
   a {
     text-decoration: none;
@@ -62,6 +66,9 @@
 }
 
 .legal {
+  // Room for the fixed back-to-top button, which sits over this row at the very bottom.
+  padding-right: 64px;
+  flex-wrap: wrap;
   display: flex;
   justify-content: space-between;
   gap: 16px;

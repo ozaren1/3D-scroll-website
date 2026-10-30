@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { availability, tools } from "@/app/data";
+import { tools } from "@/app/data";
 import { usePlayer } from "@/lib/player";
 import type { Profile, Project } from "@/lib/types";
 import { formatTimecode } from "@/lib/timecode";
@@ -18,7 +18,10 @@ function splitTagline(text: string): [string, string] {
 
 // Opening screen after sybiosme.com: a full-bleed halftone picture (here the showreel itself),
 // a statement top right, the action on the left and the surname as a wordmark across the bottom.
-export default function Hero({ profile, showreel }: { profile: Profile; showreel: Project | null }) {
+// `background` is the profile's showreel or, without one, the first work; the showreel button only
+// appears when a showreel is really set in the profile.
+export default function Hero({ profile, background }: { profile: Profile; background: Project | null }) {
+  const showreel = profile.showreelUrl ? background : null;
   const onPlay = usePlayer();
   const [first, ...rest] = profile.name.split(" ");
   const last = rest.join(" ");
@@ -27,10 +30,10 @@ export default function Hero({ profile, showreel }: { profile: Profile; showreel
 
   return (
     <section id="top" className={styles.hero} aria-labelledby="hero-title">
-      {showreel && (
+      {background && (
         <HalftoneVideo
-          src={showreel.videoUrl}
-          poster={showreel.posterUrl}
+          src={background.videoUrl}
+          poster={background.posterUrl}
           onTime={(t) => {
             if (timecodeRef.current) timecodeRef.current.textContent = formatTimecode(t);
           }}
@@ -51,15 +54,14 @@ export default function Hero({ profile, showreel }: { profile: Profile; showreel
       </p>
 
       <div className={styles.action} data-reveal style={delay(1)}>
-        <p className={styles.status}>
-          <span className={styles.dot} />
-          {availability}
-        </p>
+        {profile.availability && (
+          <p className={styles.status}>
+            <span className={styles.dot} />
+            {profile.availability}
+          </p>
+        )}
         <p className={styles.role}>{profile.role}</p>
         <div className={styles.buttons}>
-          <a className="btn btn-primary" href="#contact">
-            Обсудить проект <span aria-hidden="true">→</span>
-          </a>
           {showreel && (
             <button type="button" className="btn btn-ghost" onClick={() => onPlay(showreel)}>
               ▶ Шоурил

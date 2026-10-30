@@ -41,6 +41,38 @@ html {
   background: var(--bg);
 }
 
+/* Firefox; Chromium ignores ::-webkit-scrollbar when these are set, so they are scoped away from it. */
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-color: var(--yellow) var(--bg);
+    scrollbar-width: thin;
+  }
+}
+
+/* Chromium and Safari: a thin yellow bar on the page ground, squared like the rest of the UI. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+  box-shadow: inset 1px 0 0 var(--line-soft);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--yellow);
+  border: 2px solid var(--bg);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cyan);
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--bg);
+}
+
 /* One shared ground for every section: a fine dot matrix and faint scanlines. */
 body {
   background-color: var(--bg);
@@ -84,8 +116,8 @@ textarea {
 }
 
 ::selection {
-  background: var(--yellow);
-  color: var(--bg);
+  background: rgba(0, 240, 255, 0.35);
+  color: var(--ink);
 }
 
 .display {

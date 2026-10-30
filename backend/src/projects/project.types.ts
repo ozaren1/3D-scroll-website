@@ -1,7 +1,5 @@
-export const CATEGORIES = ['reels', 'ads', 'motion', 'corporate', 'clips'] as const;
 export const ORIENTATIONS = ['horizontal', 'vertical'] as const;
 
-export type Category = (typeof CATEGORIES)[number];
 export type Orientation = (typeof ORIENTATIONS)[number];
 
 export interface Project {
@@ -10,7 +8,7 @@ export interface Project {
   title: string;
   client: string | null;
   year: number;
-  category: Category;
+  category: string; // slug of a row in categories
   orientation: Orientation;
   summary: string;
   videoUrl: string;

@@ -1,10 +1,10 @@
 .about {
-  min-height: 100svh;
+  min-height: calc(100svh - 140px);
   display: grid;
   grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
   gap: var(--margin);
   align-items: center;
-  padding: 120px var(--margin) var(--section-gap);
+  padding: 28px var(--margin) var(--section-gap);
 }
 
 .wide {

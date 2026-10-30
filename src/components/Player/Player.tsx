@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { CATEGORY_LABEL, type Project } from "@/lib/types";
+import { useCategoryLabel } from "@/lib/categories";
+import type { Project } from "@/lib/types";
 import styles from "./Player.module.scss";
 
 // Full-screen viewer with sound; a native <dialog> gives focus trapping and Esc for free.
 export default function Player({ project, onClose }: { project: Project | null; onClose: () => void }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const label = useCategoryLabel();
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -41,7 +43,7 @@ export default function Player({ project, onClose }: { project: Project | null; 
               {project.title}
             </h2>
             <p className={styles.facts}>
-              {project.year} · {CATEGORY_LABEL[project.category]}
+              {project.year} · {label(project.category)}
               {project.client ? ` · ${project.client}` : ""}
             </p>
             {project.summary && <p className={styles.summary}>{project.summary}</p>}

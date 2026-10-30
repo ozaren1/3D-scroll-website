@@ -2,6 +2,17 @@ import { open } from 'node:fs/promises';
 
 export type MediaKind = 'video' | 'image';
 
+// Accepted uploads: what the browser declares, and what the bytes must then turn out to be.
+export const CONTENT_TYPES = {
+  'video/mp4': { kind: 'video', ext: 'mp4' },
+  'video/webm': { kind: 'video', ext: 'webm' },
+  'image/jpeg': { kind: 'image', ext: 'jpg' },
+  'image/png': { kind: 'image', ext: 'png' },
+  'image/webp': { kind: 'image', ext: 'webp' },
+} as const satisfies Record<string, DetectedType>;
+
+export type AcceptedContentType = keyof typeof CONTENT_TYPES;
+
 export interface DetectedType {
   kind: MediaKind;
   ext: 'mp4' | 'webm' | 'jpg' | 'png' | 'webp';

@@ -27,6 +27,10 @@ export class UploadsService {
     return this.config.getOrThrow<string>('UPLOAD_DIR');
   }
 
+  async discard(file: Express.Multer.File | undefined): Promise<void> {
+    if (file) await unlink(file.path).catch(() => undefined);
+  }
+
   async store(file: Express.Multer.File | undefined): Promise<StoredFile> {
     if (!file) throw new BadRequestException('File is required (field "file")');
     try {

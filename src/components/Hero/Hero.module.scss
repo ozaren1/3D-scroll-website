@@ -8,6 +8,16 @@
   padding: 96px var(--margin) 20px;
   overflow: hidden;
   isolation: isolate;
+  // Repeated clicks would select the giant wordmark and paint it in the selection colour;
+  // only the readable copy stays selectable.
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.statement,
+.action p {
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 .shade {

@@ -16,10 +16,12 @@
 | `auth/` | `POST /api/auth/login`, `JwtAuthGuard` для `/api/admin/*` |
 | `projects/` | репозиторий + сервис; `ProjectsController` (публичный), `AdminProjectsController` |
 | `profile/` | одна запись в таблице `settings` (key=`profile`, JSON) |
-| `contact/` | заявки, honeypot, троттлинг |
-| `uploads/` | multer → `UPLOAD_DIR`, проверка сигнатуры (mp4/webm/jpg/png/webp) |
+| `categories/` | категории работ: CRUD, порядок, видимость, SEO; `projects.category` → FK на `categories(slug)` с каскадом |
+| `services/` | карточки «Что я делаю» (settings, key `services`; id категорий и работы) |
+| `seo/` | мета-теги страниц `/`, `/works`, `/about`, `/privacy` (settings, key `seo`) |
+| `uploads/` | local: multer → `UPLOAD_DIR`; s3: presign/confirm (`s3-storage.service.ts`); проверка сигнатуры |
 
-Таблицы: `projects`, `contact_requests`, `settings`. Слой SQL только в `*.repository.ts`.
+Таблицы: `categories`, `projects`, `settings` (профиль, услуги, SEO). Слой SQL только в `*.repository.ts`.
 
 ## Фронтенд (`src/`)
 | Файл | Роль |
@@ -36,8 +38,11 @@
 | Путь | Что |
 |---|---|
 | `/` | hero, спираль работ, услуги с примерами, этапы, контакты |
-| `/works?category=` | все работы с фильтром по категориям |
+| `/works`, `/works/<slug>` | все работы и страница категории (старый `?category=` → 308) |
 | `/about` | обо мне и этапы работы |
 | `/privacy` | политика конфиденциальности и cookie |
 
 Общая оболочка (`components/Shell`): навигация, футер, плеер (`lib/player.tsx`, контекст), cookie-баннер — подключена в `app/layout.tsx`.
+
+## Админка (план 005)
+`/admin` — Next-страница без оболочки сайта: вход, «Работы» (CRUD, порядок, публикация, загрузка видео/постеров), «Категории» (CRUD, адреса, SEO, видимость), «Обо мне» (профиль, ссылки, шоурил), «Что я делаю» (карточки, работа под карточкой), «Страницы и SEO». Клиент — `src/lib/adminApi.ts`.

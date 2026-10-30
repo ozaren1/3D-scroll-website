@@ -5,6 +5,8 @@
 }
 
 .stage {
+  user-select: none;
+  -webkit-user-select: none;
   position: sticky;
   top: 0;
   height: 100svh;
@@ -20,7 +22,7 @@
   z-index: 2;
   text-align: center;
   pointer-events: none;
-  transform: translateY(-22svh);
+  transform: translateY(-24svh);
 }
 
 .title {

@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Exo_2, Share_Tech_Mono, Tektur } from "next/font/google";
-import Shell from "@/components/Shell/Shell";
 import { loadContent } from "@/lib/api";
+import { siteUrl } from "@/lib/site";
 import "./globals.css";
 
 // Test theme in the spirit of Cyberpunk 2077: the game's own faces are proprietary and lack Cyrillic,
@@ -31,6 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const { profile } = await loadContent();
   const name = `${profile.name} — ${profile.role.toLowerCase()}`;
   return {
+    metadataBase: siteUrl(),
     title: { default: name, template: `%s · ${profile.name}` },
     description: profile.tagline,
   };
@@ -40,13 +41,10 @@ export const viewport: Viewport = {
   themeColor: "#0a0a0c",
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const { profile } = await loadContent();
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ru" className={`${display.variable} ${text.variable} ${hud.variable}`}>
-      <body>
-        <Shell profile={profile}>{children}</Shell>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

@@ -4,6 +4,7 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { createS3Client, S3_CLIENT, S3StorageService } from './s3-storage.service.js';
 import { UploadsController } from './uploads.controller.js';
 import { MAX_VIDEO_BYTES, TEMP_PREFIX, UploadsService } from './uploads.service.js';
 
@@ -26,6 +27,10 @@ import { MAX_VIDEO_BYTES, TEMP_PREFIX, UploadsService } from './uploads.service.
     }),
   ],
   controllers: [UploadsController],
-  providers: [UploadsService],
+  providers: [
+    UploadsService,
+    S3StorageService,
+    { provide: S3_CLIENT, inject: [ConfigService], useFactory: createS3Client },
+  ],
 })
 export class UploadsModule {}

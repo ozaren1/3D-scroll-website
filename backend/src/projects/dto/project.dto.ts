@@ -16,12 +16,7 @@ import {
   ValidateIf,
 } from 'class-validator';
 import { IsMediaUrl, IsSlug } from '../../common/validators.js';
-import {
-  CATEGORIES,
-  ORIENTATIONS,
-  type Category,
-  type Orientation,
-} from '../project.types.js';
+import { ORIENTATIONS, type Orientation } from '../project.types.js';
 
 // Optional, but an explicit null is validated (and rejected) instead of skipped.
 const IsDefinedOrSkip = () => ValidateIf((_, value) => value !== undefined);
@@ -46,8 +41,10 @@ export class CreateProjectDto {
   @Max(2100)
   year: number;
 
-  @IsIn(CATEGORIES)
-  category: Category;
+  // Slug of an existing category.
+  @IsSlug()
+  @MaxLength(60)
+  category: string;
 
   @IsIn(ORIENTATIONS)
   orientation: Orientation;
@@ -92,6 +89,7 @@ export class ReorderProjectsDto {
 
 export class ListProjectsQueryDto {
   @IsOptional()
-  @IsIn(CATEGORIES)
-  category?: Category;
+  @IsSlug()
+  @MaxLength(60)
+  category?: string;
 }

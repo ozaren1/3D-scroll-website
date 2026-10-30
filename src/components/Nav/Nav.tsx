@@ -32,7 +32,7 @@ export default function Nav({ name }: { name: string }) {
         {initials(name)}
       </Link>
 
-      <nav className={`${styles.pill}`} aria-label="Разделы" data-open={open || undefined}>
+      <nav className={`${styles.pill}`} aria-label="Основное меню" data-open={open || undefined}>
         {navLinks.map((link) => (
           <Link key={link.href} href={link.href} onClick={() => setOpen(false)}>
             {link.label}

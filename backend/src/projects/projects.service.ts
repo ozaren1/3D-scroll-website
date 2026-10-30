@@ -5,22 +5,24 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import type { CreateProjectDto } from './dto/project.dto.js';
-import type { Category, Project, ProjectInput } from './project.types.js';
+import type { Project, ProjectInput } from './project.types.js';
 import { ProjectsRepository } from './projects.repository.js';
 
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    (error as { code?: string }).code === 'SQLITE_CONSTRAINT_UNIQUE'
-  );
+const sqliteCode = (error: unknown) =>
+  typeof error === 'object' && error !== null ? (error as { code?: string }).code : undefined;
+
+// Maps constraint failures of a project write to API errors: a taken slug, or a category that does not exist.
+function rethrow(error: unknown): never {
+  if (sqliteCode(error) === 'SQLITE_CONSTRAINT_UNIQUE') throw new ConflictException('Slug is already taken');
+  if (sqliteCode(error) === 'SQLITE_CONSTRAINT_FOREIGNKEY') throw new BadRequestException('Unknown category');
+  throw error;
 }
 
 @Injectable()
 export class ProjectsService {
   constructor(private readonly repo: ProjectsRepository) {}
 
-  listPublished(category?: Category): Project[] {
+  listPublished(category?: string): Project[] {
     return this.repo.findAll({ publishedOnly: true, category });
   }
 
@@ -47,8 +49,7 @@ export class ProjectsService {
         sortOrder: input.sortOrder ?? this.repo.nextSortOrder(),
       });
     } catch (error) {
-      if (isUniqueViolation(error)) throw new ConflictException('Slug is already taken');
-      throw error;
+      rethrow(error);
     }
   }
 
@@ -57,8 +58,7 @@ export class ProjectsService {
     try {
       project = this.repo.update(id, input);
     } catch (error) {
-      if (isUniqueViolation(error)) throw new ConflictException('Slug is already taken');
-      throw error;
+      rethrow(error);
     }
     if (!project) throw new NotFoundException('Project not found');
     return project;

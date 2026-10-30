@@ -1,4 +1,3 @@
-export type Category = "reels" | "ads" | "motion" | "corporate" | "clips";
 export type Orientation = "horizontal" | "vertical";
 
 // Mirrors the public Project shape of the API (docs/ai/plans/001-backend-and-visual.md).
@@ -8,7 +7,7 @@ export type Project = {
   title: string;
   client: string | null;
   year: number;
-  category: Category;
+  category: string; // slug of a Category
   orientation: Orientation;
   summary: string;
   videoUrl: string;
@@ -24,31 +23,33 @@ export type Profile = {
   tagline: string;
   about: string;
   location: string;
+  availability?: string;
   email: string;
   showreelUrl: string | null;
   socials: SocialLink[];
 };
 
-// Short labels for captions and the long ones for filters and headings, in display order.
-export const CATEGORY_LABEL: Record<Category, string> = {
-  reels: "Рилсы",
-  ads: "Реклама",
-  motion: "Моушен",
-  corporate: "Корпоративное",
-  clips: "Клипы",
+// Work categories are edited in the admin panel; `label` is the short name, `title` the page heading.
+export type Category = {
+  id: number;
+  slug: string;
+  label: string;
+  title: string;
+  seoTitle: string;
+  seoDescription: string;
 };
 
-export const CATEGORY_TITLE: Record<Category, string> = {
-  reels: "Рилсы и вертикальные видео",
-  ads: "Рекламные ролики",
-  motion: "Моушен-дизайн",
-  corporate: "Корпоративное видео",
-  clips: "Музыкальные клипы",
+export type Service = {
+  title: string;
+  text: string;
+  tags: string[];
+  projectId: number | null; // a chosen work for the example under the card…
+  categoryId: number | null; // …else the first work of this category…
+  fallbackId: number | null; // …else of this one
+  category: string | null; // slugs of the two categories, resolved by the API
+  fallback: string | null;
 };
 
-export const CATEGORIES = Object.keys(CATEGORY_LABEL) as Category[];
+export type PageMeta = { title: string; description: string };
 
-// Own keys only: `in` would also accept prototype names such as "__proto__".
-export function isCategory(value: unknown): value is Category {
-  return typeof value === "string" && (CATEGORIES as string[]).includes(value);
-}
+export type Seo = { home: PageMeta; works: PageMeta; about: PageMeta; privacy: PageMeta };

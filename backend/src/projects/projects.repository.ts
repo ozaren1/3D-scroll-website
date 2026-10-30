@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Database } from 'better-sqlite3';
 import { DATABASE } from '../database/database.module.js';
-import type { Category, Project, ProjectInput } from './project.types.js';
+import type { Project, ProjectInput } from './project.types.js';
 
 interface ProjectRow {
   id: number;
@@ -9,7 +9,7 @@ interface ProjectRow {
   title: string;
   client: string | null;
   year: number;
-  category: Category;
+  category: string;
   orientation: Project['orientation'];
   summary: string;
   video_url: string;
@@ -67,7 +67,7 @@ function toParams(input: Partial<ProjectInput>): Record<string, unknown> {
 export class ProjectsRepository {
   constructor(@Inject(DATABASE) private readonly db: Database) {}
 
-  findAll(options: { publishedOnly: boolean; category?: Category }): Project[] {
+  findAll(options: { publishedOnly: boolean; category?: string }): Project[] {
     const where: string[] = [];
     const params: Record<string, unknown> = {};
     if (options.publishedOnly) where.push('published = 1');

@@ -9,12 +9,13 @@ export const DEFAULT_PROFILE: ProfileDto = {
     'Восемь лет в монтаже: реклама, музыкальные клипы, ролики для соцсетей и титры. ' +
     'Собираю историю из исходников, делаю цвет, звук и графику в одном месте, ' +
     'поэтому ролик не ходит по трём подрядчикам. Работаю в Premiere Pro, After Effects и DaVinci Resolve.',
-  location: 'Алматы, работаю удалённо',
+  location: 'Москва · работаю по всей России',
+  availability: 'Беру проекты на ноябрь',
   email: 'hello@example.com',
   showreelUrl: null,
   socials: [
     { label: 'Telegram', url: 'https://t.me/example' },
-    { label: 'Instagram', url: 'https://instagram.com/example' },
-    { label: 'Vimeo', url: 'https://vimeo.com/example' },
+    { label: 'ВКонтакте', url: 'https://vk.com/example' },
+    { label: 'VK Видео', url: 'https://vkvideo.ru/@example' },
   ],
 };

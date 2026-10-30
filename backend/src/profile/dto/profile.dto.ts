@@ -48,6 +48,12 @@ export class ProfileDto {
   @MaxLength(120)
   location: string;
 
+  // Status line in the hero, e.g. "Беру проекты на ноябрь"; empty hides it.
+  @IsOptional()
+  @IsString()
+  @MaxLength(80)
+  availability?: string;
+
   @IsEmail()
   email: string;
 

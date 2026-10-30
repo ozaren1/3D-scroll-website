@@ -3,7 +3,8 @@
 import clsx from "clsx";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePlayer } from "@/lib/player";
-import { CATEGORY_LABEL, type Project } from "@/lib/types";
+import { useCategoryLabel } from "@/lib/categories";
+import type { Project } from "@/lib/types";
 import { usePrefersReducedMotion } from "@/lib/useReveal";
 import styles from "./WorkSpiral.module.scss";
 
@@ -11,7 +12,7 @@ import styles from "./WorkSpiral.module.scss";
 // after the "Our work" section of sybiosme.com. Scroll drives it; nothing is hijacked.
 const PER_TURN = 7; // cards per full turn
 const MIN_CARDS = 14; // repeat the works until the helix is this dense
-const FRONT_DROP = 0.1; // the card facing the camera rides this far below the centre line (viewport heights)
+const FRONT_DROP = 0.06; // the card facing the camera rides this far below the centre line (viewport heights)
 const RISE = 0.16; // vertical step between cards, in viewport heights
 
 function plural(n: number) {
@@ -24,6 +25,7 @@ function plural(n: number) {
 
 export default function WorkSpiral({ projects }: { projects: Project[] }) {
   const onOpen = usePlayer();
+  const label = useCategoryLabel();
   const wrapRef = useRef<HTMLElement>(null);
   const helixRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -176,7 +178,7 @@ export default function WorkSpiral({ projects }: { projects: Project[] }) {
                   <video src={`${project.videoUrl}#t=0.5`} muted playsInline preload="metadata" />
                 )}
                 <span className={`${styles.cardMeta} hud`}>
-                  {project.year}{" // "}{CATEGORY_LABEL[project.category]}
+                  {project.year}{" // "}{label(project.category)}
                 </span>
               </button>
             ))}
@@ -187,7 +189,7 @@ export default function WorkSpiral({ projects }: { projects: Project[] }) {
           {frontProject && (
             <>
               <span className={`${styles.captionMeta} hud`}>
-                {frontProject.year}{" // "}{CATEGORY_LABEL[frontProject.category]}
+                {frontProject.year}{" // "}{label(frontProject.category)}
                 {frontProject.client ? ` // ${frontProject.client}` : ""}
               </span>
               <strong>{frontProject.title}</strong>

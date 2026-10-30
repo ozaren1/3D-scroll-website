@@ -14,7 +14,7 @@ export class ProfileService {
     const row = this.db
       .prepare<[string], { value: string }>('SELECT value FROM settings WHERE key = ?')
       .get(PROFILE_KEY);
-    return row ? (JSON.parse(row.value) as ProfileDto) : DEFAULT_PROFILE;
+    return row ? { ...DEFAULT_PROFILE, ...(JSON.parse(row.value) as ProfileDto) } : DEFAULT_PROFILE;
   }
 
   save(profile: ProfileDto): ProfileDto {
@@ -24,6 +24,7 @@ export class ProfileService {
       tagline: profile.tagline,
       about: profile.about,
       location: profile.location,
+      availability: profile.availability ?? '',
       email: profile.email,
       showreelUrl: profile.showreelUrl ?? null,
       socials: profile.socials.map(({ label, url }) => ({ label, url })),

@@ -72,15 +72,74 @@ const MIGRATIONS: string[] = [
 
   ALTER TABLE contact_requests ADD COLUMN consented_at TEXT;
   `,
+  // 3: the contact form is gone (no personal data is collected any more): drop stored requests.
+  `
+  DROP TABLE IF EXISTS contact_requests;
+  `,
+  // 4: categories become editable rows; projects point at them by slug, so renaming a slug cascades.
+  `
+  CREATE TABLE categories (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    slug            TEXT    NOT NULL UNIQUE,
+    label           TEXT    NOT NULL,
+    title           TEXT    NOT NULL,
+    seo_title       TEXT    NOT NULL DEFAULT '',
+    seo_description TEXT    NOT NULL DEFAULT '',
+    sort_order      INTEGER NOT NULL DEFAULT 0,
+    visible         INTEGER NOT NULL DEFAULT 1 CHECK (visible IN (0, 1))
+  );
+  INSERT INTO categories (slug, label, title, sort_order) VALUES
+    ('reels', 'Рилсы', 'Рилсы и вертикальные видео', 0),
+    ('ads', 'Реклама', 'Рекламные ролики', 1),
+    ('motion', 'Моушен', 'Моушен-дизайн', 2),
+    ('corporate', 'Корпоративное', 'Корпоративное видео', 3),
+    ('clips', 'Клипы', 'Музыкальные клипы', 4);
+
+  CREATE TABLE projects_v4 (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    slug        TEXT    NOT NULL UNIQUE,
+    title       TEXT    NOT NULL,
+    client      TEXT,
+    year        INTEGER NOT NULL,
+    category    TEXT    NOT NULL REFERENCES categories (slug) ON UPDATE CASCADE ON DELETE RESTRICT,
+    orientation TEXT    NOT NULL CHECK (orientation IN ('horizontal', 'vertical')),
+    summary     TEXT    NOT NULL DEFAULT '',
+    video_url   TEXT    NOT NULL,
+    poster_url  TEXT,
+    sort_order  INTEGER NOT NULL DEFAULT 0,
+    published   INTEGER NOT NULL DEFAULT 1 CHECK (published IN (0, 1)),
+    created_at  TEXT    NOT NULL DEFAULT ${NOW},
+    updated_at  TEXT    NOT NULL DEFAULT ${NOW}
+  );
+  INSERT INTO projects_v4 (id, slug, title, client, year, category, orientation, summary, video_url,
+                           poster_url, sort_order, published, created_at, updated_at)
+    SELECT id, slug, title, client, year, category, orientation, summary, video_url,
+           poster_url, sort_order, published, created_at, updated_at
+    FROM projects;
+  UPDATE sqlite_sequence
+    SET seq = MAX(seq, COALESCE((SELECT seq FROM sqlite_sequence WHERE name = 'projects'), 0))
+    WHERE name = 'projects_v4';
+  DROP TABLE projects;
+  ALTER TABLE projects_v4 RENAME TO projects;
+  CREATE INDEX projects_public_idx ON projects (published, sort_order);
+  CREATE INDEX projects_category_idx ON projects (category);
+  `,
 ];
+
+// Migrations after which freed pages must be wiped from the file (dropped personal data).
+const VACUUM_AFTER = new Set([3]);
 
 export function runMigrations(db: Database): number {
   const current = db.pragma('user_version', { simple: true }) as number;
+  let vacuum = false;
   for (let version = current; version < MIGRATIONS.length; version++) {
     db.transaction(() => {
       db.exec(MIGRATIONS[version]);
       db.pragma(`user_version = ${version + 1}`);
     })();
+    if (VACUUM_AFTER.has(version + 1)) vacuum = true;
   }
+  // VACUUM cannot run inside a transaction; it rewrites the file without the dropped rows.
+  if (vacuum && current > 0) db.exec('VACUUM');
   return MIGRATIONS.length;
 }
