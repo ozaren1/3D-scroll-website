@@ -10,7 +10,7 @@ const ACCEPT = {
   image: "image/jpeg,image/png,image/webp",
 };
 
-// A media URL with an upload button: the file goes to S3 (or the API) and the field gets its URL.
+// A media URL with an upload button: the file goes to the server's disk and the field gets its URL.
 export default function MediaField({
   label,
   kind,

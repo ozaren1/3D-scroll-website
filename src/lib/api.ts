@@ -22,8 +22,8 @@ async function getJson<T>(path: string): Promise<T | null> {
   }
 }
 
-// Media uploaded with the local storage driver lives on the API host; S3 URLs are absolute
-// already, and everything else is served by Next from /public.
+// Uploaded media lives on the API host; absolute URLs stay as they are, and everything else
+// is served by Next from /public.
 export function resolveMediaUrl(url: string | null): string | null {
   if (!url) return null;
   return url.startsWith("/media/") ? `${PUBLIC_API_URL}${url}` : url;

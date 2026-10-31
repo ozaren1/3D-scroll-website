@@ -1,6 +1,6 @@
 # Portfolio API
 
-API сайта-портфолио: работы, профиль, карточки услуг, загрузка медиа (локально или в S3). NestJS 12 (ESM), SQLite (better-sqlite3), JWT.
+API сайта-портфолио: работы, профиль, карточки услуг, загрузка медиа на диск сервера. NestJS 12 (ESM), SQLite (better-sqlite3), JWT.
 Контракт — `../docs/ai/plans/001-backend-and-visual.md`, архитектура — `../docs/ai/ARCHITECTURE.md`.
 
 ## Запуск
@@ -18,7 +18,7 @@ npm run start:dev      # http://localhost:4000/api
 
 ```bash
 npm test          # unit
-npm run test:e2e  # e2e на :memory: БД и временной папке загрузок (S3 проверяется unit-тестами с подменным клиентом)
+npm run test:e2e  # e2e на :memory: БД и временной папке загрузок
 npm run lint
 npm run build
 ```
@@ -37,23 +37,40 @@ curl -s localhost:4000/api/admin/projects -H "Authorization: Bearer $TOKEN" -H '
 ```
 
 ## Продакшен
-- Один процесс за nginx; `TRUST_PROXY=1`, чтобы лимиты считались по реальному IP.
-- `DATABASE_PATH` и `UPLOAD_DIR` — на постоянном диске; бэкап = копия файла БД (`sqlite3 portfolio.db ".backup out.db"`) и папки загрузок.
-- `/media/*` лучше отдавать nginx-ом напрямую из `UPLOAD_DIR` (Range-запросы, кэш).
+- Один процесс за Caddy/nginx; `TRUST_PROXY=1`, чтобы лимиты считались по реальному IP.
+- `DATABASE_PATH` и `UPLOAD_DIR` — на постоянном диске (в Docker — volume).
 
-## Хранилище медиа (S3)
+## Хранилище медиа (диск сервера)
 
-По умолчанию (`STORAGE_DRIVER=local`) файлы лежат в `UPLOAD_DIR` и отдаются по `/media/*`.
-Для продакшена — S3-совместимый бакет (Yandex Object Storage, Selectel, VK Cloud):
+Файлы лежат в `UPLOAD_DIR` под именами `<uuid>.<ext>` и отдаются по `/media/*`. Админка шлёт файл в `POST /api/admin/uploads`; multer пишет его потоком во временный `.upload-*`, сервер проверяет первые байты (mp4, webm, jpg, png, webp) и размер, затем переименовывает.
 
-1. Создать бакет и сервисный ключ с правом записи. Анонимное чтение (только `GetObject`, без листинга) открыть **только для префикса `media/`**. Для префикса `incoming/` добавить правило жизненного цикла «удалять через 1 день» — там лежат загрузки, которые ещё не прошли проверку.
-2. В `.env`: `STORAGE_DRIVER=s3`, `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_PUBLIC_URL` (адрес бакета или его CDN без `/` на конце).
-3. Разрешить CORS в бакете — админка загружает файлы прямо из браузера, а hero читает видео в WebGL:
+- **Лимиты:** видео — `MAX_VIDEO_MB` (по умолчанию 2048), картинки — 10 МБ. Загрузка отклоняется с 507, если после неё на диске останется меньше `MIN_FREE_MB` (по умолчанию 2048). Без `Content-Length` считается худший случай (`MAX_VIDEO_MB`). Таймаут запроса Node поднят до 2 ч для всех запросов, поэтому API — только за прокси.
+- **Уборка:** раз в час (и при старте) удаляются файлы, на которые уже сутки не ссылается ни одна работа и ни одна настройка (шоурил в профиле и т. п.) — заменённое видео можно вернуть в течение суток; также брошенные `.upload-*` старше суток. Отсчёт идёт в памяти процесса, перезапуск его сбрасывает. Файлы с другими именами не трогаются.
+- **Место:** `GET /api/admin/uploads/usage` — занято/свободно, видно в админке на вкладке «Работы».
+- **Видео для веба:** перед загрузкой лучше перекодировать в H.264 1080p ~5–8 Мбит/с с `-movflags +faststart` (иначе браузер ждёт конец файла перед стартом):
+  `ffmpeg -i in.mov -c:v libx264 -crf 22 -preset slow -vf scale=-2:1080 -c:a aac -b:a 128k -movflags +faststart out.mp4`
 
-```json
-[
-  { "AllowedOrigins": ["https://ваш-домен.ru"], "AllowedMethods": ["POST", "GET", "HEAD"], "AllowedHeaders": ["*"], "MaxAgeSeconds": 3600 }
-]
+### Отдача через прокси
+`/media/*` выгоднее отдавать прокси напрямую с диска (Range-запросы, sendfile), а не через Node. Пример для Caddy (папка смонтирована в контейнер Caddy только на чтение):
+
+```
+api.example.ru {
+  handle_path /media/* {
+    root * /srv/uploads
+    header Cache-Control "public, max-age=2592000, immutable"
+    header Cross-Origin-Resource-Policy cross-origin
+    header Access-Control-Allow-Origin https://example.ru
+    @hidden path_regexp hidden ^/\.
+    respond @hidden 404
+    file_server
+  }
+  reverse_proxy api:4000
+}
 ```
 
-Как это работает: `POST /api/admin/uploads/presign` выдаёт подписанную форму (один ключ, один тип, лимит размера, 15 минут), браузер шлёт файл в бакет под `incoming/`, затем `POST /api/admin/uploads/confirm` проверяет размер и первые байты, копирует файл в публичный `media/` и удаляет из `incoming/`. Не прошедший проверку файл удаляется. В режиме s3 загрузка через API (`POST /api/admin/uploads`) выключена.
+`Access-Control-Allow-Origin` нужен: hero читает кадры видео в WebGL. У Caddy нет лимита на размер тела по умолчанию; в nginx — `client_max_body_size 2100m;`, `proxy_request_buffering off;` и `proxy_read_timeout 2h;` для `/api/admin/uploads`.
+
+### Бэкап
+Диск — единственная копия контента. Нужен бэкап **с историей**, а не зеркало: `rsync --delete` повторит на копии любое случайное удаление. Варианты: снапшоты диска у хостера, restic/borg (`restic backup uploads/ data/backup.db` по cron, хранить несколько недель) или `rsync -a --backup --backup-dir=../deleted-$(date +%F)`. БД перед копированием — `sqlite3 portfolio.db ".backup data/backup.db"`.
+
+Уборка не удаляет ничего, если в БД нет ни одной работы или если «лишними» оказалась больше четверти файлов (признак не той БД — проверьте `DATABASE_PATH`); в лог пишется предупреждение.

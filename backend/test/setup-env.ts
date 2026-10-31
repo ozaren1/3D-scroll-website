@@ -8,6 +8,7 @@ import { TEST_ADMIN_EMAIL, TEST_ADMIN_PASSWORD } from './constants.js';
 
 process.env.DATABASE_PATH = ':memory:';
 process.env.UPLOAD_DIR = mkdtempSync(join(tmpdir(), 'portfolio-uploads-'));
+process.env.MIN_FREE_MB = '0';
 process.env.CORS_ORIGINS = 'http://localhost:3000';
 process.env.TRUST_PROXY = 'false';
 process.env.JWT_SECRET = 'test-secret-that-is-long-enough-for-validation';

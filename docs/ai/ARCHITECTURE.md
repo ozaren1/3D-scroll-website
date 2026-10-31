@@ -19,7 +19,7 @@
 | `categories/` | категории работ: CRUD, порядок, видимость, SEO; `projects.category` → FK на `categories(slug)` с каскадом |
 | `services/` | карточки «Что я делаю» (settings, key `services`; id категорий и работы) |
 | `seo/` | мета-теги страниц `/`, `/works`, `/about`, `/privacy` (settings, key `seo`) |
-| `uploads/` | local: multer → `UPLOAD_DIR`; s3: presign/confirm (`s3-storage.service.ts`); проверка сигнатуры |
+| `uploads/` | multer → `UPLOAD_DIR` (диск сервера), проверка сигнатуры, лимиты и свободное место (507), `usage`; `MediaSweeper` раз в час удаляет файлы без ссылок старше суток |
 
 Таблицы: `categories`, `projects`, `settings` (профиль, услуги, SEO). Слой SQL только в `*.repository.ts`.
 

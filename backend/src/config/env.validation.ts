@@ -1,8 +1,6 @@
 import { plainToInstance, Transform } from 'class-transformer';
 import {
-  IsBooleanString,
   IsEmail,
-  IsIn,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -46,39 +44,20 @@ export class EnvironmentVariables {
   @Matches(/^\d+[smhd]$/, { message: 'JWT_EXPIRES_IN must look like 12h, 30m or 7d' })
   JWT_EXPIRES_IN = '12h';
 
-  // Where uploaded media goes: the local UPLOAD_DIR, or an S3-compatible bucket
-  // (Yandex Object Storage, Selectel, VK Cloud, AWS…). The S3_* values are required for "s3".
-  @IsIn(['local', 's3'])
-  STORAGE_DRIVER: 'local' | 's3' = 'local';
-
+  // Largest accepted video, in MB. Images are capped at 10 MB.
   @IsOptional()
-  @IsString()
-  S3_ENDPOINT?: string;
+  @Transform(({ value }) => (value === undefined ? 2048 : Number(value)))
+  @IsInt()
+  @Min(1)
+  @Max(20480)
+  MAX_VIDEO_MB = 2048;
 
+  // Uploads are refused when they would leave less than this much free disk, in MB.
   @IsOptional()
-  @IsString()
-  S3_REGION?: string;
-
-  @IsOptional()
-  @IsString()
-  S3_BUCKET?: string;
-
-  @IsOptional()
-  @IsString()
-  S3_ACCESS_KEY_ID?: string;
-
-  @IsOptional()
-  @IsString()
-  S3_SECRET_ACCESS_KEY?: string;
-
-  // Public base URL of the bucket (or its CDN), e.g. https://storage.yandexcloud.net/my-bucket
-  @IsOptional()
-  @Matches(/^https:\/\/\S+[^/]$/, { message: 'S3_PUBLIC_URL must be an https URL without a trailing slash' })
-  S3_PUBLIC_URL?: string;
-
-  @IsOptional()
-  @IsBooleanString()
-  S3_FORCE_PATH_STYLE?: string;
+  @Transform(({ value }) => (value === undefined ? 2048 : Number(value)))
+  @IsInt()
+  @Min(0)
+  MIN_FREE_MB = 2048;
 
   @IsEmail()
   ADMIN_EMAIL: string;
@@ -96,12 +75,6 @@ export function validateEnv(config: Record<string, unknown>): EnvironmentVariabl
   });
   const errors = validateSync(validated, { skipMissingProperties: false });
   const details = errors.flatMap((e) => Object.values(e.constraints ?? {}));
-  if (validated.STORAGE_DRIVER === 's3') {
-    const required = ['S3_REGION', 'S3_BUCKET', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY', 'S3_PUBLIC_URL'] as const;
-    for (const key of required) {
-      if (!validated[key]) details.push(`${key} is required when STORAGE_DRIVER=s3`);
-    }
-  }
   if (details.length > 0) {
     throw new Error(`Invalid environment: ${details.join('; ')}`);
   }

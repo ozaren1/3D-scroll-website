@@ -1,49 +1,48 @@
 import {
-  BadRequestException,
-  Body,
   Controller,
-  HttpCode,
+  Get,
   Post,
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  type CallHandler,
+  type ExecutionContext,
+  Injectable,
+  type NestInterceptor,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import type { Request } from 'express';
+import { from, switchMap } from 'rxjs';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
-import { ConfirmUploadDto, PresignUploadDto } from './dto/upload.dto.js';
-import { S3StorageService } from './s3-storage.service.js';
 import { UploadsService } from './uploads.service.js';
+
+// Runs before multer, so a file that would fill the disk is refused before a byte is written.
+@Injectable()
+class DiskSpaceInterceptor implements NestInterceptor {
+  constructor(private readonly uploads: UploadsService) {}
+
+  intercept(context: ExecutionContext, next: CallHandler) {
+    const req = context.switchToHttp().getRequest<Request>();
+    const header = req.headers['content-length'];
+    const declared = header !== undefined && /^\d+$/.test(header) ? Number(header) : null;
+    return from(this.uploads.ensureRoomFor(declared)).pipe(switchMap(() => next.handle()));
+  }
+}
 
 // Guards run before interceptors, so anonymous requests never reach the disk.
 @UseGuards(JwtAuthGuard)
 @Controller('admin/uploads')
 export class UploadsController {
-  constructor(
-    private readonly uploads: UploadsService,
-    private readonly s3: S3StorageService,
-  ) {}
+  constructor(private readonly uploads: UploadsService) {}
 
-  // Local storage: the file comes through the API.
   @Post()
-  @UseInterceptors(FileInterceptor('file'))
-  async upload(@UploadedFile() file: Express.Multer.File | undefined) {
-    if (this.s3.enabled) {
-      await this.uploads.discard(file);
-      throw new BadRequestException('Uploads go to S3: use /admin/uploads/presign');
-    }
+  @UseInterceptors(DiskSpaceInterceptor, FileInterceptor('file'))
+  upload(@UploadedFile() file: Express.Multer.File | undefined) {
     return this.uploads.store(file);
   }
 
-  // Tells the admin panel how to upload: straight to the bucket (signed form) or through the API.
-  @Post('presign')
-  @HttpCode(200)
-  presign(@Body() dto: PresignUploadDto) {
-    return this.s3.enabled ? this.s3.presign(dto.contentType, dto.size) : { mode: 'local' as const };
-  }
-
-  @Post('confirm')
-  @HttpCode(200)
-  confirm(@Body() dto: ConfirmUploadDto) {
-    return this.s3.confirm(dto.key);
+  @Get('usage')
+  usage() {
+    return this.uploads.usage();
   }
 }

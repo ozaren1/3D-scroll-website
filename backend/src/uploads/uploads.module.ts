@@ -4,9 +4,9 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { createS3Client, S3_CLIENT, S3StorageService } from './s3-storage.service.js';
+import { MediaSweeper } from './media-sweeper.js';
 import { UploadsController } from './uploads.controller.js';
-import { MAX_VIDEO_BYTES, TEMP_PREFIX, UploadsService } from './uploads.service.js';
+import { maxVideoBytes, TEMP_PREFIX, UploadsService } from './uploads.service.js';
 
 @Module({
   imports: [
@@ -16,21 +16,18 @@ import { MAX_VIDEO_BYTES, TEMP_PREFIX, UploadsService } from './uploads.service.
         const dir = config.getOrThrow<string>('UPLOAD_DIR');
         mkdirSync(dir, { recursive: true });
         return {
+          // Streams straight to disk, so even a multi-gigabyte video never sits in memory.
           storage: diskStorage({
             destination: dir,
             // Dot-prefixed temp name: the static handler refuses dotfiles.
             filename: (_req, _file, cb) => cb(null, `${TEMP_PREFIX}${randomUUID()}`),
           }),
-          limits: { fileSize: MAX_VIDEO_BYTES, files: 1, fields: 0 },
+          limits: { fileSize: maxVideoBytes(config), files: 1, fields: 0 },
         };
       },
     }),
   ],
   controllers: [UploadsController],
-  providers: [
-    UploadsService,
-    S3StorageService,
-    { provide: S3_CLIENT, inject: [ConfigService], useFactory: createS3Client },
-  ],
+  providers: [UploadsService, MediaSweeper],
 })
 export class UploadsModule {}

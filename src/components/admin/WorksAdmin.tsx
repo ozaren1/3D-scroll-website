@@ -1,11 +1,27 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { admin, type AdminCategory, type AdminProject, type ProjectInput } from "@/lib/adminApi";
+import {
+  admin,
+  diskUsage,
+  formatBytes,
+  type AdminCategory,
+  type AdminProject,
+  type DiskUsage,
+  type ProjectInput,
+} from "@/lib/adminApi";
 import { resolveMediaUrl } from "@/lib/api";
 import MediaField from "./MediaField";
 import { slugify } from "./slugify";
 import styles from "./admin.module.scss";
+
+function plural(n: number, one: string, few: string, many: string) {
+  const m10 = n % 10;
+  const m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return one;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
+  return many;
+}
 
 const EMPTY: ProjectInput = {
   slug: "",
@@ -25,12 +41,14 @@ export default function WorksAdmin() {
   const [categories, setCategories] = useState<AdminCategory[]>([]);
   const [editing, setEditing] = useState<{ id: number | null; input: ProjectInput } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [usage, setUsage] = useState<DiskUsage | null>(null);
 
   const load = useCallback(async () => {
     try {
       const [list, cats] = await Promise.all([admin.projects(), admin.categories()]);
       setProjects(list);
       setCategories(cats);
+      setUsage(await diskUsage().catch(() => null));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Не удалось загрузить работы");
     }
@@ -102,6 +120,13 @@ export default function WorksAdmin() {
           + Добавить работу
         </button>
       </div>
+      {usage && (
+        <p className={styles.muted}>
+          Медиа на сервере: {formatBytes(usage.usedBytes)} ({usage.files} {plural(usage.files, "файл", "файла", "файлов")}) · свободно{" "}
+          {formatBytes(usage.freeBytes)} из {formatBytes(usage.totalBytes)} · видео до{" "}
+          {formatBytes(usage.maxVideoBytes)}. Неиспользуемые файлы стираются с диска автоматически.
+        </p>
+      )}
       {error && (
         <p className={styles.error} role="alert">
           {error}

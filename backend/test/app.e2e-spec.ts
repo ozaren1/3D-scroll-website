@@ -218,24 +218,17 @@ describe('Portfolio API (e2e)', () => {
   describe('uploads', () => {
     const uploadDir = process.env.UPLOAD_DIR!;
 
-    it('tells the admin to upload through the API when S3 is off', async () => {
-      await request(http).post('/api/admin/uploads/presign').send({ contentType: 'video/mp4', size: 10 }).expect(401);
-      const res = await request(http)
-        .post('/api/admin/uploads/presign')
-        .set(admin())
-        .send({ contentType: 'video/mp4', size: 10 })
-        .expect(200);
-      expect(res.body).toEqual({ mode: 'local' });
-      await request(http)
-        .post('/api/admin/uploads/presign')
-        .set(admin())
-        .send({ contentType: 'text/html', size: 10 })
-        .expect(400);
-      await request(http)
-        .post('/api/admin/uploads/confirm')
-        .set(admin())
-        .send({ key: 'media/x.mp4' })
-        .expect(400);
+    it('has no S3 endpoints any more', async () => {
+      await request(http).post('/api/admin/uploads/presign').set(admin()).send({}).expect(404);
+      await request(http).post('/api/admin/uploads/confirm').set(admin()).send({}).expect(404);
+    });
+
+    it('reports disk usage to the admin only', async () => {
+      await request(http).get('/api/admin/uploads/usage').expect(401);
+      const res = await request(http).get('/api/admin/uploads/usage').set(admin()).expect(200);
+      expect(res.body).toMatchObject({ minFreeBytes: 0, maxVideoBytes: 2048 * 1024 * 1024, maxImageBytes: 10 * 1024 * 1024 });
+      expect(res.body.freeBytes).toBeGreaterThan(0);
+      expect(res.body.totalBytes).toBeGreaterThanOrEqual(res.body.freeBytes);
     });
 
     it('requires auth', async () => {
@@ -279,6 +272,12 @@ describe('Portfolio API (e2e)', () => {
     it('does not serve dotfiles', async () => {
       expect(existsSync(join(uploadDir))).toBe(true);
       await request(http).get('/media/.upload-anything').expect(404);
+    });
+
+    it('counts stored files in the usage', async () => {
+      const res = await request(http).get('/api/admin/uploads/usage').set(admin()).expect(200);
+      expect(res.body.files).toBe(2);
+      expect(res.body.usedBytes).toBe(MP4_HEAD.length + PNG_HEAD.length);
     });
   });
 
