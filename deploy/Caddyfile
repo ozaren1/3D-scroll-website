@@ -1,0 +1,28 @@
+# One origin for everything: the site, /api and /media. SITE_ADDRESS is ":80" until a domain
+# points here; with "example.ru, www.example.ru" Caddy gets HTTPS certificates by itself.
+{$SITE_ADDRESS} {
+	encode zstd gzip
+
+	# Uploaded media straight from disk: Range requests, no Node in the way.
+	handle_path /media/* {
+		@hidden path_regexp ^/\.
+		respond @hidden 404
+		root * /srv/uploads
+		header Cache-Control "public, max-age=2592000, immutable"
+		file_server
+	}
+
+	handle /api/* {
+		reverse_proxy api:4000
+	}
+
+	handle {
+		reverse_proxy web:3000
+	}
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+}

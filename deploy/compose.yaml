@@ -1,0 +1,48 @@
+# Production stack on the VPS. Lives in /opt/portfolio/app/deploy; state stays outside the code:
+# /opt/portfolio/{.env, data, uploads, backups}. See deploy/README.md.
+name: portfolio
+
+services:
+  api:
+    build: ../backend
+    restart: unless-stopped
+    env_file: /opt/portfolio/.env
+    environment:
+      PORT: "4000"
+      DATABASE_PATH: /app/data/portfolio.db
+      UPLOAD_DIR: /app/uploads
+      TRUST_PROXY: "1"
+    volumes:
+      - /opt/portfolio/data:/app/data
+      - /opt/portfolio/uploads:/app/uploads
+
+  web:
+    build: ..
+    restart: unless-stopped
+    environment:
+      API_URL: http://api:4000
+      SITE_URL: ${SITE_URL:-}
+    depends_on:
+      - api
+
+  caddy:
+    image: caddy:2.8-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - /opt/portfolio/uploads:/srv/uploads:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+      - api
+
+volumes:
+  caddy_data:
+  caddy_config:
