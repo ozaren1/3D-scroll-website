@@ -3,8 +3,8 @@
 # The copies live on the same disk: they guard against mistakes, not against losing the server.
 set -euo pipefail
 cd "$(dirname "$0")"
-mkdir -p /opt/portfolio/data/backups
 docker compose --env-file /opt/portfolio/.env exec -T api node -e "
+  require('fs').mkdirSync('/app/data/backups', { recursive: true });
   const db = require('better-sqlite3')('/app/data/portfolio.db', { readonly: true });
   db.backup('/app/data/backups/portfolio-' + new Date().toISOString().slice(0, 10) + '.db').then(() => db.close());
 "
