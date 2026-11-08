@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useRef } from "react";
 import { usePlayer } from "@/lib/player";
 import { useCategories } from "@/lib/categories";
+import { usePrefersReducedMotion } from "@/lib/useReveal";
 import type { Project, Service } from "@/lib/types";
-import { TiltCard, TiltItem } from "../TiltCard/TiltCard";
+import { TiltCard } from "../TiltCard/TiltCard";
 import styles from "./Services.module.scss";
 
 const delay = (i: number) => ({ "--i": i }) as React.CSSProperties;
@@ -18,6 +20,43 @@ function exampleFor(service: Service, projects: Project[]) {
   if (own) return { project: own, own: true };
   const near = projects.find((p) => p.category === service.fallback) ?? projects[0];
   return near ? { project: near, own: false } : null;
+}
+
+// The example video: still until the mouse is over it or the card has keyboard focus. Leaving reloads
+// the element, which brings the poster back and stops the download. Touch screens just open the player.
+function ExampleButton({ project, onOpen }: { project: Project; onOpen: () => void }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  const reduced = usePrefersReducedMotion();
+  const start = () => {
+    if (!reduced) ref.current?.play().catch(() => undefined);
+  };
+  const stop = () => ref.current?.load();
+
+  return (
+    <button
+      type="button"
+      className={styles.media}
+      onClick={onOpen}
+      onPointerEnter={(e) => e.pointerType === "mouse" && start()}
+      onPointerLeave={(e) => e.pointerType === "mouse" && stop()}
+      onFocus={(e) => e.currentTarget.matches(":focus-visible") && start()}
+      onBlur={stop}
+      aria-label={`Смотреть пример: «${project.title}»`}
+    >
+      <video
+        ref={ref}
+        src={`${project.videoUrl}#t=0.5`}
+        poster={project.posterUrl ?? undefined}
+        muted
+        loop
+        playsInline
+        preload="metadata"
+      />
+      <span className={styles.play} aria-hidden="true">
+        ▶
+      </span>
+    </button>
+  );
 }
 
 export default function Services({ projects, services }: { projects: Project[]; services: Service[] }) {
@@ -40,56 +79,38 @@ export default function Services({ projects, services }: { projects: Project[]; 
           const category = categoryOf(service.category);
           return (
             <li key={service.title} className={styles.item} data-reveal style={delay(i + 1)}>
-              <TiltCard className={styles.tilt} max={10}>
-                <article className={styles.card}>
-                  <TiltItem depth={50}>
-                    <h3 className={styles.cardTitle}>{service.title}</h3>
-                  </TiltItem>
-                  <TiltItem depth={30}>
-                    <p className={styles.cardText}>{service.text}</p>
-                  </TiltItem>
-                  <TiltItem depth={70} className={styles.tags}>
+              {example && (
+                <TiltCard className={styles.tilt} max={6}>
+                  <ExampleButton project={example.project} onOpen={() => play(example.project)} />
+                </TiltCard>
+              )}
+
+              <article className={styles.body}>
+                <h3 className={styles.cardTitle}>{service.title}</h3>
+                <p className={styles.cardText}>{service.text}</p>
+                {service.tags.length > 0 && (
+                  <div className={styles.tags}>
                     {service.tags.map((tag) => (
                       <span key={tag} className="hud">
                         {tag}
                       </span>
                     ))}
-                  </TiltItem>
-                </article>
-              </TiltCard>
-
-              {example && (
-                <div className={styles.example}>
-                  <button
-                    type="button"
-                    className={styles.exampleMedia}
-                    onClick={() => play(example.project)}
-                    aria-label={`Смотреть пример: «${example.project.title}»`}
-                  >
-                    {example.project.posterUrl ? (
-                      // Posters may live on the API host; plain <img> avoids configuring next/image domains.
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={example.project.posterUrl} alt="" loading="lazy" />
-                    ) : (
-                      <video src={`${example.project.videoUrl}#t=0.5`} muted playsInline preload="metadata" />
-                    )}
-                    <span className={styles.play} aria-hidden="true">
-                      ▶
-                    </span>
-                  </button>
-                  <div className={styles.exampleText}>
-                    <span className={`${styles.exampleLabel} hud`}>
-                      {example.own ? "Пример" : `Пока пример из «${categoryOf(example.project.category)?.label ?? ""}»`}
-                    </span>
-                    <strong>{example.project.title}</strong>
-                    {category && (
-                      <Link className={styles.more} href={`/works/${category.slug}`}>
-                        Все работы: {category.label} →
-                      </Link>
-                    )}
                   </div>
-                </div>
-              )}
+                )}
+                {example && (
+                  <p className={styles.exampleLine}>
+                    <span className="hud">
+                      {example.own ? "Пример" : `Пока пример из «${categoryOf(example.project.category)?.label ?? ""}»`}
+                    </span>{" "}
+                    {example.project.title}
+                  </p>
+                )}
+                {category && (
+                  <Link className={styles.more} href={`/works/${category.slug}`}>
+                    Все работы: {category.label} →
+                  </Link>
+                )}
+              </article>
             </li>
           );
         })}

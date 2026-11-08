@@ -58,13 +58,14 @@
 }
 
 .media {
+  --tilt-clip: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px));
   justify-self: end;
   width: 100%;
   max-width: 420px;
 }
 
 .still {
-  clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px));
+  clip-path: var(--tilt-clip);
   background: var(--panel);
 
   video {

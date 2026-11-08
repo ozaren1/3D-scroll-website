@@ -1,5 +1,5 @@
-import { fallbackCategories, fallbackProfile, fallbackProjects, fallbackSeo, fallbackServices } from "@/app/data";
-import type { Category, PageMeta, Profile, Project, Seo, Service } from "./types";
+import { fallbackCategories, fallbackProfile, fallbackProjects, fallbackSeo, fallbackServices, processSteps } from "@/app/data";
+import type { Category, PageMeta, Profile, Project, Seo, ProcessStep, Service } from "./types";
 
 // Server-side base URL (may be an internal address); the browser uses NEXT_PUBLIC_API_URL.
 const SERVER_API_URL = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "";
@@ -41,16 +41,18 @@ export type Content = {
   profile: Profile;
   projects: Project[];
   services: Service[];
+  process: ProcessStep[];
   categories: Category[];
   seo: Seo;
 };
 
 // Next deduplicates these fetches within one render, so every page and layout can call this freely.
 export async function loadContent(): Promise<Content> {
-  const [profile, projects, services, categories, seo] = await Promise.all([
+  const [profile, projects, services, process, categories, seo] = await Promise.all([
     getJson<Profile>("/profile"),
     getJson<Project[]>("/projects"),
     getJson<Service[]>("/services"),
+    getJson<ProcessStep[]>("/process"),
     getJson<Category[]>("/categories"),
     getJson<Seo>("/seo"),
   ]);
@@ -60,6 +62,7 @@ export async function loadContent(): Promise<Content> {
     profile: { ...resolvedProfile, showreelUrl: resolveMediaUrl(resolvedProfile.showreelUrl) },
     projects: (projects ?? fallbackProjects).map(withMedia),
     services: services ?? fallbackServices,
+    process: process ?? processSteps,
     categories: categories ?? fallbackCategories,
     seo: seo ?? fallbackSeo,
   };

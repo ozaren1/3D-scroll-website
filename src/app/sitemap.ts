@@ -2,6 +2,9 @@ import type { MetadataRoute } from "next";
 import { loadContent } from "@/lib/api";
 import { absoluteUrl } from "@/lib/seo";
 
+// SITE_URL is known only at runtime, so this must not be prerendered during the image build.
+export const dynamic = "force-dynamic";
+
 export const revalidate = 3600;
 
 // Public pages only: the fixed pages and every visible category.

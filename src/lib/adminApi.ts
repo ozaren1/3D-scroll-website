@@ -1,7 +1,7 @@
 "use client";
 
 import { PUBLIC_API_URL } from "./api";
-import type { Category, Orientation, Profile, Seo, Service } from "./types";
+import type { Category, Orientation, ProcessStep, Profile, Seo, Service } from "./types";
 
 // Client for the admin API. The token lives in sessionStorage: it is gone when the tab closes.
 const TOKEN_KEY = "admin-token";
@@ -97,6 +97,8 @@ export const admin = {
   saveProfile: (profile: Profile) => request<Profile>("PUT", "/admin/profile", profile),
   services: () => request<Service[]>("GET", "/services"),
   saveServices: (items: ServiceInput[]) => request<Service[]>("PUT", "/admin/services", { items }),
+  process: () => request<ProcessStep[]>("GET", "/process"),
+  saveProcess: (items: ProcessStep[]) => request<ProcessStep[]>("PUT", "/admin/process", { items }),
   categories: () => request<AdminCategory[]>("GET", "/admin/categories"),
   createCategory: (input: CategoryInput) => request<AdminCategory>("POST", "/admin/categories", input),
   updateCategory: (id: number, input: Partial<CategoryInput>) =>

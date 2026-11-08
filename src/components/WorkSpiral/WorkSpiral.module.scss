@@ -16,13 +16,14 @@
   place-items: center;
 }
 
-// Heading above the centre line and the front card below it, so the pair sits centred on screen.
+// Pinned under the header, leaving the rest of the screen to the card that is playing.
 .center {
   position: relative;
   z-index: 2;
+  align-self: start;
+  margin-top: clamp(72px, 9svh, 110px);
   text-align: center;
   pointer-events: none;
-  transform: translateY(-24svh);
 }
 
 .title {
@@ -52,7 +53,7 @@
 }
 
 .helix {
-  --r: min(620px, 42vw);
+  --r: min(620px, 42vw); // default until the script takes over
   position: absolute;
   top: 50%;
   left: 50%;
@@ -73,10 +74,12 @@
   border: 0;
   background: var(--panel);
   cursor: pointer;
-  transform: translateY(calc(var(--i) * var(--rise, 16vh))) rotateY(var(--angle)) translateZ(var(--r));
+  transform: translateY(calc(var(--i) * var(--rise, 16vh))) rotateY(var(--angle)) translateZ(var(--r)) scale(var(--front, 1));
   backface-visibility: hidden;
   clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
-  transition: filter 0.3s ease;
+  transition:
+    filter 0.3s ease,
+    transform 0.4s var(--ease-out);
 
   img,
   video {
@@ -108,57 +111,80 @@
   }
 }
 
+// The work facing the camera: larger, playing, and with its label moved up under the heading.
+.active {
+  --front: 1.2;
+
+  .cardMeta {
+    display: none;
+  }
+}
+
+// Fades in over the poster once frames are really coming.
+.card .live {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+
+  &[data-playing] {
+    opacity: 1;
+  }
+}
+
+// Sized so that, enlarged by perspective, a tall card fills 54% of the screen height at most.
 .vertical {
+  --w: min(clamp(200px, 21vw, 330px), calc(54svh / 1.444 / var(--depth, 1.7)));
   aspect-ratio: 9 / 13;
-  top: calc(var(--w) * -0.7);
+  top: calc(var(--w) * -0.722);
+
+  &.active {
+    --front: 1;
+  }
 }
 
 .cardMeta {
   position: absolute;
   left: 10px;
-  bottom: 8px;
+  top: 8px;
   padding: 2px 6px;
   background: rgba(10, 10, 12, 0.8);
   color: var(--yellow);
   font-size: 12px;
 }
 
+// The work now playing, under the heading: read first, and clear of the cards.
 .caption {
-  position: absolute;
-  left: var(--margin);
-  bottom: var(--margin);
-  z-index: 3;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 280px;
-  padding: 16px 22px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 2px 14px;
+  margin-top: 14px;
+  padding: 0 var(--margin);
+  text-shadow: 0 1px 10px rgba(10, 10, 12, 0.9);
 
   strong {
     font-family: var(--font-d);
     font-size: var(--step-lead);
     font-weight: 700;
     text-transform: uppercase;
+    color: #fff;
   }
-}
 
-.captionMeta {
-  font-size: var(--step-small);
-  color: var(--cyan);
+  span {
+    font-size: var(--step-small);
+    color: var(--cyan);
+  }
 }
 
 @media (max-width: 700px) {
-  .helix {
-    --r: 46vw;
-  }
-
   .card {
     --w: 44vw;
   }
 
-  .caption {
-    right: var(--margin);
-    min-width: 0;
+  .vertical {
+    --w: min(44vw, calc(54svh / 1.444 / var(--depth, 1.1)));
   }
 }
 
@@ -199,9 +225,5 @@
     &[aria-hidden] {
       display: none;
     }
-  }
-
-  .caption {
-    display: none;
   }
 }

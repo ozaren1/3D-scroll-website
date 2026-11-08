@@ -29,6 +29,8 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
+  // Same outline as the card's content, or the glare paints over its cut corners.
+  clip-path: var(--tilt-clip, none);
   pointer-events: none;
   opacity: 0;
   background: radial-gradient(

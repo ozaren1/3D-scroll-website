@@ -13,71 +13,72 @@
   color: var(--yellow);
 }
 
+// A compact row of cards: a still until hovered, the words under it.
 .grid {
   list-style: none;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--margin);
+  gap: 40px var(--margin);
   margin-top: 56px;
 }
 
 .item {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .tilt {
-  flex: 1;
+  --tilt-clip: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
 }
 
-// The example work under each card.
-.example {
-  display: grid;
-  grid-template-columns: 112px 1fr;
-  gap: 14px;
-  align-items: center;
-  padding: 12px;
-  background: var(--panel);
-  box-shadow: inset 2px 0 0 var(--cyan);
-}
-
-.exampleMedia {
+.media {
   position: relative;
+  display: block;
+  width: 100%;
   aspect-ratio: 16 / 10;
   padding: 0;
   border: 0;
   background: var(--panel-2);
   cursor: pointer;
   overflow: hidden;
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+  clip-path: var(--tilt-clip);
 
-  img,
   video {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.4s var(--ease-out);
+    transition: transform 0.5s var(--ease-out);
   }
 
-  &:hover img,
   &:hover video,
-  &:focus-visible img {
-    transform: scale(1.08);
+  &:focus-visible video {
+    transform: scale(1.04);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 2px 0 var(--yellow);
+    pointer-events: none;
   }
 
   &:focus-visible {
     outline: none;
+  }
+
+  &:focus-visible::after {
     box-shadow: inset 0 0 0 3px var(--cyan);
   }
 }
 
 .play {
   position: absolute;
-  inset: 0;
-  margin: auto;
-  width: 30px;
-  height: 30px;
+  right: 12px;
+  bottom: 12px;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
   background: var(--yellow);
@@ -85,52 +86,10 @@
   font-size: 11px;
 }
 
-.exampleText {
+.body {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-
-  strong {
-    font-family: var(--font-d);
-    font-weight: 700;
-    text-transform: uppercase;
-    line-height: 1.1;
-  }
-}
-
-.exampleLabel {
-  font-size: 12px;
-  color: var(--cyan);
-}
-
-.more {
-  margin-top: 4px;
-  font-size: var(--step-small);
-  color: var(--muted);
-  text-decoration: none;
-
-  &:hover {
-    color: var(--yellow);
-  }
-}
-
-.card {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  height: 100%;
-  min-height: 300px;
-  padding: 28px;
-  background: var(--panel);
-  transform-style: preserve-3d;
-  clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, var(--cut) 100%, 0 calc(100% - var(--cut)));
-  box-shadow: inset 0 2px 0 var(--yellow);
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background: var(--panel-2);
-  }
+  gap: 8px;
 }
 
 .cardTitle {
@@ -142,6 +101,7 @@
 }
 
 .cardText {
+  font-size: var(--step-small);
   color: rgba(241, 241, 234, 0.82);
 }
 
@@ -149,13 +109,31 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: auto;
 
   span {
-    padding: 4px 10px;
+    padding: 2px 8px;
     background: rgba(0, 240, 255, 0.1);
     color: var(--cyan);
-    font-size: var(--step-small);
+    font-size: 13px;
+  }
+}
+
+.exampleLine {
+  font-size: var(--step-small);
+
+  span {
+    color: var(--cyan);
+  }
+}
+
+.more {
+  width: fit-content;
+  font-size: var(--step-small);
+  color: var(--muted);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--yellow);
   }
 }
 
@@ -168,9 +146,5 @@
 @media (max-width: 600px) {
   .grid {
     grid-template-columns: 1fr;
-  }
-
-  .card {
-    min-height: 0;
   }
 }

@@ -12,8 +12,10 @@ import styles from "./WorkSpiral.module.scss";
 // after the "Our work" section of sybiosme.com. Scroll drives it; nothing is hijacked.
 const PER_TURN = 7; // cards per full turn
 const MIN_CARDS = 14; // repeat the works until the helix is this dense
-const FRONT_DROP = 0.06; // the card facing the camera rides this far below the centre line (viewport heights)
+const FRONT_DROP = 0.12; // on screen, the front card's centre sits this far below the middle (viewport heights)
+const PERSPECTIVE = 1500; // px, same as .space in the stylesheet
 const RISE = 0.16; // vertical step between cards, in viewport heights
+const SETTLE_MS = 250; // a card must stay in front this long before its video loads
 
 function plural(n: number) {
   const mod10 = n % 10;
@@ -23,6 +25,38 @@ function plural(n: number) {
   return "работ";
 }
 
+// Plays one work muted over its card's poster. Clearing the source on unmount drops the download,
+// so scrolling past many cards does not leave them all fetching.
+function LiveVideo({ src }: { src: string }) {
+  const ref = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = ref.current;
+    if (!video) return;
+    video.src = src;
+    video.play().catch(() => undefined);
+    return () => {
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+    };
+  }, [src]);
+
+  return (
+    <video
+      ref={ref}
+      className={styles.live}
+      muted
+      loop
+      playsInline
+      aria-hidden="true"
+      onPlaying={(e) => {
+        e.currentTarget.dataset.playing = "";
+      }}
+    />
+  );
+}
+
 export default function WorkSpiral({ projects }: { projects: Project[] }) {
   const onOpen = usePlayer();
   const label = useCategoryLabel();
@@ -30,6 +64,7 @@ export default function WorkSpiral({ projects }: { projects: Project[] }) {
   const helixRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [front, setFront] = useState(0);
+  const [live, setLive] = useState<number | null>(null);
   const reduced = usePrefersReducedMotion();
 
   const cards = useMemo(() => {
@@ -65,8 +100,14 @@ export default function WorkSpiral({ projects }: { projects: Project[] }) {
       const rise = RISE * vh;
       const at = current * (cards.length - 1);
       const turn = at * step;
+      // The front card is nearer than the helix axis, so perspective enlarges it and its offset by `depth`.
+      const vw = window.innerWidth;
+      const radius = vw <= 700 ? 0.46 * vw : Math.min(620, 0.42 * vw);
+      const depth = PERSPECTIVE / (PERSPECTIVE - radius);
       helix.style.setProperty("--rise", `${rise.toFixed(1)}px`); // same unit as the JS math, unlike svh
-      helix.style.transform = `translateY(${(-at * rise + FRONT_DROP * vh).toFixed(1)}px) rotateY(${(-turn).toFixed(2)}deg)`;
+      helix.style.setProperty("--r", `${radius.toFixed(1)}px`);
+      helix.style.setProperty("--depth", depth.toFixed(3));
+      helix.style.transform = `translateY(${(-at * rise + (FRONT_DROP * vh) / depth).toFixed(1)}px) rotateY(${(-turn).toFixed(2)}deg)`;
 
       // Fade cards that face away from the camera; the one facing it gets the caption.
       let best = 0;
@@ -105,9 +146,28 @@ export default function WorkSpiral({ projects }: { projects: Project[] }) {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       helix.style.removeProperty("transform");
+      helix.style.removeProperty("--r");
+      helix.style.removeProperty("--depth");
       els.forEach((el) => el?.style.removeProperty("opacity"));
     };
   }, [cards, reduced]);
+
+  // The front card starts playing once the helix settles on it, and only while the section is on screen.
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    if (!wrap || reduced) return;
+    let timer = 0;
+    const observer = new IntersectionObserver(([entry]) => {
+      window.clearTimeout(timer);
+      if (entry.isIntersecting) timer = window.setTimeout(() => setLive(front), SETTLE_MS);
+      else setLive(null);
+    });
+    observer.observe(wrap);
+    return () => {
+      window.clearTimeout(timer);
+      observer.disconnect();
+    };
+  }, [front, reduced]);
 
   const frontProject = cards[front]?.project;
 
@@ -143,9 +203,19 @@ export default function WorkSpiral({ projects }: { projects: Project[] }) {
           <p className={styles.line}>
             Монтаж, который <span className="accent">досматривают.</span>
           </p>
-          <p className={`${styles.count} hud`}>
-            {projects.length} {plural(projects.length)} · нажмите на карточку
-          </p>
+          {reduced || !frontProject ? (
+            <p className={`${styles.count} hud`}>
+              {projects.length} {plural(projects.length)} · нажмите на карточку
+            </p>
+          ) : (
+            <p className={styles.caption} aria-hidden="true">
+              <strong>{frontProject.title}</strong>
+              <span className="hud">
+                {frontProject.year}{" // "}{label(frontProject.category)}
+                {frontProject.client ? ` // ${frontProject.client}` : ""}
+              </span>
+            </p>
+          )}
         </div>
 
         <div className={styles.space}>
@@ -157,7 +227,11 @@ export default function WorkSpiral({ projects }: { projects: Project[] }) {
                   cardRefs.current[i] = el;
                 }}
                 type="button"
-                className={clsx(styles.card, project.orientation === "vertical" && styles.vertical)}
+                className={clsx(
+                  styles.card,
+                  project.orientation === "vertical" && styles.vertical,
+                  i === front && !reduced && styles.active,
+                )}
                 style={
                   {
                     "--angle": `${(i * 360) / PER_TURN}deg`,
@@ -177,24 +251,13 @@ export default function WorkSpiral({ projects }: { projects: Project[] }) {
                 ) : (
                   <video src={`${project.videoUrl}#t=0.5`} muted playsInline preload="metadata" />
                 )}
+                {i === live && <LiveVideo src={project.videoUrl} />}
                 <span className={`${styles.cardMeta} hud`}>
                   {project.year}{" // "}{label(project.category)}
                 </span>
               </button>
             ))}
           </div>
-        </div>
-
-        <div className={`${styles.caption} panel`} aria-hidden="true">
-          {frontProject && (
-            <>
-              <span className={`${styles.captionMeta} hud`}>
-                {frontProject.year}{" // "}{label(frontProject.category)}
-                {frontProject.client ? ` // ${frontProject.client}` : ""}
-              </span>
-              <strong>{frontProject.title}</strong>
-            </>
-          )}
         </div>
       </div>
     </section>

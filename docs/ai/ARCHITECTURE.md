@@ -18,6 +18,7 @@
 | `profile/` | одна запись в таблице `settings` (key=`profile`, JSON) |
 | `categories/` | категории работ: CRUD, порядок, видимость, SEO; `projects.category` → FK на `categories(slug)` с каскадом |
 | `services/` | карточки «Что я делаю» (settings, key `services`; id категорий и работы) |
+| `process/` | этапы «Как идёт работа» (settings, key `process`) |
 | `seo/` | мета-теги страниц `/`, `/works`, `/about`, `/privacy` (settings, key `seo`) |
 | `uploads/` | multer → `UPLOAD_DIR` (диск сервера), проверка сигнатуры, лимиты и свободное место (507), `usage`; `MediaSweeper` раз в час удаляет файлы без ссылок старше суток |
 

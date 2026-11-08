@@ -6,6 +6,15 @@ services:
   api:
     build: ../backend
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:4000/api/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
     env_file: /opt/portfolio/.env
     environment:
       PORT: "4000"
@@ -19,11 +28,16 @@ services:
   web:
     build: ..
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     environment:
       API_URL: http://api:4000
       SITE_URL: ${SITE_URL:-}
     depends_on:
-      - api
+      api:
+        condition: service_healthy
 
   caddy:
     image: caddy:2.8-alpine

@@ -354,6 +354,22 @@ describe('Portfolio API (e2e)', () => {
     });
   });
 
+  describe('process', () => {
+    it('serves the default steps and saves edits for the admin only', async () => {
+      const before = await request(http).get('/api/process').expect(200);
+      expect(before.body).toHaveLength(4);
+
+      const items = [{ title: '  Бриф ', time: ' 1 день ' }];
+      await request(http).put('/api/admin/process').send({ items }).expect(401);
+      const saved = await request(http).put('/api/admin/process').set(admin()).send({ items }).expect(200);
+      expect(saved.body).toEqual([{ title: 'Бриф', time: '1 день' }]);
+      expect((await request(http).get('/api/process').expect(200)).body).toEqual(saved.body);
+
+      await request(http).put('/api/admin/process').set(admin()).send({ items: [{ title: '   ', time: '' }] }).expect(400);
+      await request(http).put('/api/admin/process').set(admin()).send({ items: Array(9).fill(items[0]) }).expect(400);
+    });
+  });
+
   describe('services', () => {
     it('serves default cards with category slugs, then the saved ones', async () => {
       const before = await request(http).get('/api/services').expect(200);

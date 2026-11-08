@@ -25,9 +25,12 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  // The halftone picture is bright: an even veil first, then deeper shade behind the text blocks.
   background:
-    linear-gradient(to top, rgba(10, 10, 12, 0.85) 0%, transparent 45%),
-    linear-gradient(to right, rgba(10, 10, 12, 0.6), transparent 40%);
+    linear-gradient(to top, rgba(10, 10, 12, 0.9) 0%, transparent 50%),
+    linear-gradient(to right, rgba(10, 10, 12, 0.65), transparent 45%),
+    linear-gradient(to left, rgba(10, 10, 12, 0.75), transparent 50%),
+    rgba(10, 10, 12, 0.45);
 }
 
 .hudTop,
@@ -45,7 +48,8 @@
   display: flex;
   justify-content: space-between;
   font-size: var(--step-small);
-  color: var(--muted);
+  color: #fff;
+  text-shadow: 0 1px 8px rgba(10, 10, 12, 0.9);
 }
 
 .rec {
@@ -72,9 +76,11 @@
   font-size: clamp(1.5rem, 1rem + 1.5vw, 2.4rem);
   font-weight: 600;
   line-height: 1.12;
+  color: #fff;
+  text-shadow: 0 2px 16px rgba(10, 10, 12, 0.85);
 
   span {
-    color: var(--muted);
+    font-weight: 400;
   }
 }
 
@@ -107,6 +113,8 @@
   margin-top: 10px;
   font-size: var(--step-lead);
   font-weight: 600;
+  color: #fff;
+  text-shadow: 0 2px 16px rgba(10, 10, 12, 0.85);
 }
 
 .buttons {
@@ -154,13 +162,21 @@
   gap: 8px 24px;
   margin-top: 12px;
   font-size: var(--step-small);
-  color: var(--muted);
+  color: #fff;
+  text-shadow: 0 1px 8px rgba(10, 10, 12, 0.9);
 }
 
 @media (max-width: 900px) {
   .hero {
     grid-template-rows: auto auto 1fr auto auto;
     padding-top: 84px;
+  }
+
+  // On a phone the text runs over the whole picture, so the veil is even and dense.
+  .shade {
+    background:
+      linear-gradient(to top, rgba(10, 10, 12, 0.9) 0%, transparent 50%),
+      rgba(10, 10, 12, 0.68);
   }
 
   .statement {

@@ -10,6 +10,7 @@ import { HealthController } from './health/health.controller.js';
 import { ProfileModule } from './profile/profile.module.js';
 import { ProjectsModule } from './projects/projects.module.js';
 import { SeoModule } from './seo/seo.module.js';
+import { ProcessModule } from './process/process.module.js';
 import { ServicesModule } from './services/services.module.js';
 import { UploadsModule } from './uploads/uploads.module.js';
 
@@ -23,6 +24,7 @@ import { UploadsModule } from './uploads/uploads.module.js';
     ProjectsModule,
     ProfileModule,
     ServicesModule,
+    ProcessModule,
     SeoModule,
     UploadsModule,
   ],

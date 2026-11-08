@@ -26,13 +26,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-  const { profile, projects, services } = await loadContent();
+  const { profile, projects, services, process } = await loadContent();
   return (
     <>
       <Hero profile={profile} background={pickShowreel(profile, projects)} />
       <WorkSpiral projects={projects} />
       <Services projects={projects} services={services} />
-      <Process />
+      <Process steps={process} />
       <Contact profile={profile} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(personAndSite(profile)) }} />
     </>

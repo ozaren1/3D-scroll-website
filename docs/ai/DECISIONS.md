@@ -74,3 +74,7 @@
 - Docker Compose + Caddy на VPS владельца; образы собираются на сервере.
 - Один origin для сайта, API и медиа (`NEXT_PUBLIC_API_URL` пустой) — без CORS и поддомена `api.`.
 - Секреты генерируются на сервере, пароль админа владелец задаёт сам (`deploy/set-admin.sh`).
+
+## 2026-11-09 — План 010 и инцидент
+- `GET /api/process`, `PUT /api/admin/process`: этапы «Как идёт работа» в `settings`.
+- После взлома: перед выкладкой обязателен `npm audit --omit=dev`; контейнеры всегда пересоздаются при деплое; `web` и `api` без capabilities и `no-new-privileges`; `/_next/image` закрыт.

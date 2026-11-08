@@ -12,6 +12,9 @@
 		file_server
 	}
 
+	# The site does not use the image optimizer: keep the endpoint unreachable.
+	respond /_next/image* 404
+
 	handle /api/* {
 		reverse_proxy api:4000
 	}

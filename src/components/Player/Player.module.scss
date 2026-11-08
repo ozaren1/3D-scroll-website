@@ -45,8 +45,10 @@
   }
 }
 
+// At the top of the column, level with the top of the screen, where it is read first.
 .meta {
-  align-self: end;
+  align-self: start;
+  padding-top: 8px;
 }
 
 .title {
@@ -60,7 +62,7 @@
 .facts {
   margin-top: 6px;
   font-size: var(--step-small);
-  color: var(--muted);
+  color: var(--cyan);
 }
 
 .summary {
@@ -89,6 +91,10 @@
   .body {
     grid-template-columns: 1fr;
     align-content: center;
+  }
+
+  .meta {
+    padding-top: 0;
   }
 
   .video,

@@ -24,13 +24,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AboutPage() {
-  const { profile, projects } = await loadContent();
+  const { profile, projects, process } = await loadContent();
   const still = projects.find((p) => p.orientation === "vertical") ?? projects[0] ?? null;
   return (
     <>
       <Breadcrumbs items={[{ name: "Обо мне", path: "/about" }]} />
       <About profile={profile} still={still} />
-      <Process />
+      <Process steps={process} />
     </>
   );
 }

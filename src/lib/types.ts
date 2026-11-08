@@ -39,6 +39,8 @@ export type Category = {
   seoDescription: string;
 };
 
+export type ProcessStep = { title: string; time: string };
+
 export type Service = {
   title: string;
   text: string;

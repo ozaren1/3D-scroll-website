@@ -6,6 +6,7 @@ import { getToken, login, logout } from "@/lib/adminApi";
 import CategoriesAdmin from "./CategoriesAdmin";
 import ProfileAdmin from "./ProfileAdmin";
 import SeoAdmin from "./SeoAdmin";
+import ProcessAdmin from "./ProcessAdmin";
 import ServicesAdmin from "./ServicesAdmin";
 import WorksAdmin from "./WorksAdmin";
 import styles from "./admin.module.scss";
@@ -15,6 +16,7 @@ const TABS = [
   { id: "categories", label: "Категории" },
   { id: "profile", label: "Обо мне" },
   { id: "services", label: "Что я делаю" },
+  { id: "process", label: "Как идёт работа" },
   { id: "seo", label: "Страницы и SEO" },
 ] as const;
 
@@ -72,6 +74,7 @@ export default function AdminApp() {
         {tab === "works" && <WorksAdmin />}
         {tab === "profile" && <ProfileAdmin />}
         {tab === "services" && <ServicesAdmin />}
+        {tab === "process" && <ProcessAdmin />}
         {tab === "categories" && <CategoriesAdmin />}
         {tab === "seo" && <SeoAdmin />}
         <p className={styles.note}>Изменения появляются на сайте в течение минуты.</p>
@@ -109,11 +112,11 @@ function Login({ onDone }: { onDone: () => void }) {
         <h1 className={`${styles.loginTitle} display`}>Вход</h1>
         <label className={styles.field}>
           <span>Почта</span>
-          <input name="email" type="email" required autoComplete="username" />
+          <input className={styles.input} name="email" type="email" placeholder=" " required autoComplete="username" />
         </label>
         <label className={styles.field}>
           <span>Пароль</span>
-          <input name="password" type="password" required autoComplete="current-password" />
+          <input className={styles.input} name="password" type="password" placeholder=" " required autoComplete="current-password" />
         </label>
         {error && (
           <p className={styles.error} role="alert">
