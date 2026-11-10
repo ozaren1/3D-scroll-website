@@ -1,5 +1,10 @@
 # One origin for everything: the site, /api and /media. SITE_ADDRESS is ":80" until a domain
-# points here; with "example.ru, www.example.ru" Caddy gets HTTPS certificates by itself.
+# points here; with a domain ("example.ru") Caddy gets HTTPS certificates by itself.
+# REDIRECT_ADDRESS ("www.example.ru") answers with a permanent redirect to the main address.
+{$REDIRECT_ADDRESS} {
+	redir https://{$SITE_ADDRESS}{uri} permanent
+}
+
 {$SITE_ADDRESS} {
 	encode zstd gzip
 
@@ -24,6 +29,8 @@
 	}
 
 	header {
+		# Browsers honour it only over HTTPS, so it is harmless while the site runs on a bare IP.
+		Strict-Transport-Security "max-age=31536000"
 		X-Content-Type-Options nosniff
 		Referrer-Policy strict-origin-when-cross-origin
 		-Server
