@@ -69,12 +69,36 @@
   list-style: none;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-flow: dense;
   gap: 32px var(--margin);
   margin-top: 48px;
 }
 
-.tall .media {
-  aspect-ratio: 9 / 11;
+// A vertical work takes two rows and its picture stretches to their height, so the
+// horizontal cards beside it pack in without a hole under them.
+.tall {
+  grid-row: span 2;
+
+  .card {
+    height: 100%;
+  }
+
+  .tilt {
+    flex: 1;
+    min-height: 320px;
+  }
+
+  .media {
+    aspect-ratio: auto;
+    height: 100%;
+
+    // Out of the flow, so the video's own tall size doesn't stretch the rows.
+    img,
+    video {
+      position: absolute;
+      inset: 0;
+    }
+  }
 }
 
 .card {
@@ -172,8 +196,21 @@
 }
 
 @media (max-width: 600px) {
-
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .tall {
+    grid-row: auto;
+
+    .tilt {
+      flex: none;
+      min-height: 0;
+    }
+
+    .media {
+      aspect-ratio: 9 / 11;
+      height: auto;
+    }
   }
 }
