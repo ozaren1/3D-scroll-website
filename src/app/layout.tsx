@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Exo_2, Share_Tech_Mono, Tektur } from "next/font/google";
+import { Exo_2, JetBrains_Mono, Share_Tech_Mono, Tektur } from "next/font/google";
 import { loadContent } from "@/lib/api";
 import { siteUrl } from "@/lib/site";
 import "./globals.css";
@@ -27,6 +27,15 @@ const hud = Share_Tech_Mono({
   display: "swap",
 });
 
+// Cyrillic for the same HUD labels (Share Tech Mono has none): without it phones fall back to a
+// system font in the middle of a label. Only the Cyrillic subset is loaded.
+const hudCyrillic = JetBrains_Mono({
+  subsets: ["cyrillic"],
+  weight: "400",
+  variable: "--font-hud-cyrillic",
+  display: "swap",
+});
+
 export async function generateMetadata(): Promise<Metadata> {
   const { profile } = await loadContent();
   const name = `${profile.name} — ${profile.role.toLowerCase()}`;
@@ -48,7 +57,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru" className={`${display.variable} ${text.variable} ${hud.variable}`}>
+    <html lang="ru" className={`${display.variable} ${text.variable} ${hud.variable} ${hudCyrillic.variable}`}>
       <body>{children}</body>
     </html>
   );

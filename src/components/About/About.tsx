@@ -4,6 +4,7 @@ import type { Profile, Project } from "@/lib/types";
 import AutoVideo from "../AutoVideo/AutoVideo";
 import { TiltCard, TiltItem } from "../TiltCard/TiltCard";
 import styles from "./About.module.scss";
+import { ArrowRight } from "../Icon/Icon";
 
 const delay = (i: number) => ({ "--i": i }) as React.CSSProperties;
 
@@ -36,7 +37,7 @@ export default function About({ profile, still }: { profile: Profile; still: Pro
         </div>
         <div className={styles.actions} data-reveal style={delay(2)}>
           <Link className="btn btn-primary" href="/works">
-            Смотреть работы <span aria-hidden="true">→</span>
+            Смотреть работы <ArrowRight />
           </Link>
           <Link className="btn btn-ghost" href="/#contact">
             Обсудить проект

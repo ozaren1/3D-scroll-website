@@ -26,7 +26,7 @@
 
   --font-d: var(--font-display), "Arial Narrow", sans-serif;
   --font-t: var(--font-text), system-ui, sans-serif;
-  --font-h: var(--font-hud), ui-monospace, monospace;
+  --font-h: var(--font-hud), var(--font-hud-cyrillic), ui-monospace, monospace;
   --margin: clamp(16px, 2.6vw, 40px);
   --section-gap: clamp(96px, 11vw, 170px);
   --cut: 18px; /* chamfer size of panels and buttons */

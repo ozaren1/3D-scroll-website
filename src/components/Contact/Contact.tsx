@@ -1,5 +1,6 @@
 import type { Profile } from "@/lib/types";
 import styles from "./Contact.module.scss";
+import { ArrowUpRight } from "../Icon/Icon";
 
 // Direct contacts only: there is no form, so the site collects no personal data.
 export default function Contact({ profile }: { profile: Profile }) {
@@ -25,7 +26,7 @@ export default function Contact({ profile }: { profile: Profile }) {
       <div className={`${styles.card} panel`} data-reveal style={{ "--i": 1 } as React.CSSProperties}>
         {telegram && (
           <a className={`${styles.primary} btn btn-primary`} href={telegram.url} target="_blank" rel="noopener noreferrer">
-            Написать в Telegram <span aria-hidden="true">↗</span>
+            Написать в Telegram <ArrowUpRight />
           </a>
         )}
         <a className={`${styles.primary} btn btn-ghost`} href={mailto}>
@@ -38,7 +39,7 @@ export default function Contact({ profile }: { profile: Profile }) {
               <li key={s.url}>
                 <a href={s.url} target="_blank" rel="noopener noreferrer">
                   <span className="hud">{s.label}</span>
-                  <span aria-hidden="true">↗</span>
+                  <ArrowUpRight />
                 </a>
               </li>
             ))}

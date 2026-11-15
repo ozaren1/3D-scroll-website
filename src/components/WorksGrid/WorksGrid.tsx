@@ -8,6 +8,7 @@ import type { Category, Project } from "@/lib/types";
 import { usePrefersReducedMotion } from "@/lib/useReveal";
 import { TiltCard } from "../TiltCard/TiltCard";
 import styles from "./WorksGrid.module.scss";
+import { Play } from "../Icon/Icon";
 
 // One work: the card leans towards the mouse and its video plays while the mouse is over it
 // (or the card has keyboard focus). Leaving reloads the video, which restores the poster and
@@ -43,7 +44,7 @@ function WorkCard({ project, meta, onOpen }: { project: Project; meta: string; o
             preload="metadata"
           />
           <span className={styles.play} aria-hidden="true">
-            ▶
+            <Play />
           </span>
         </span>
       </TiltCard>

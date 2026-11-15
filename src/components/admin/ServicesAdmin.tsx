@@ -69,7 +69,7 @@ export default function ServicesAdmin() {
   return (
     <form className={styles.section} onSubmit={submit}>
       <div className={styles.sectionHead}>
-        <h1 className={styles.h1}>Что я делаю</h1>
+        <h1 className={styles.h1}>Виды работ</h1>
         {items.length < 12 && (
           <button type="button" className="btn btn-ghost" onClick={() => setItems([...items, NEW_CARD])}>
             + Добавить услугу
@@ -77,7 +77,7 @@ export default function ServicesAdmin() {
         )}
       </div>
       <p className={styles.muted}>
-        Услуги показываются на главной в блоке «Работы», справа от видео. Подсвечивается услуга, к которой
+        Виды работ показываются на главной в блоке «Работы», справа от видео (на телефоне — внизу). Подсвечивается услуга, к которой
         относится видео на экране; по клику на услугу лента прокручивается к её работе. Порядок здесь — порядок
         на сайте (стрелки ↑ ↓).
       </p>

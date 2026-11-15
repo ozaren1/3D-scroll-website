@@ -2,6 +2,7 @@ import Link from "next/link";
 import { navLinks } from "@/app/data";
 import type { Profile } from "@/lib/types";
 import styles from "./Footer.module.scss";
+import { ArrowUpRight } from "../Icon/Icon";
 
 const DEVELOPER = { label: "ozaren1", url: "https://github.com/ozaren1" };
 
@@ -19,7 +20,7 @@ export default function Footer({ profile }: { profile: Profile }) {
             {profile.socials.map((s) => (
               <li key={s.url}>
                 <a href={s.url} target="_blank" rel="noopener noreferrer">
-                  {s.label} ↗
+                  {s.label} <ArrowUpRight />
                 </a>
               </li>
             ))}
@@ -53,7 +54,7 @@ export default function Footer({ profile }: { profile: Profile }) {
         <span>
           Разработка —{" "}
           <a href={DEVELOPER.url} target="_blank" rel="noopener noreferrer">
-            {DEVELOPER.label} ↗
+            {DEVELOPER.label} <ArrowUpRight />
           </a>
         </span>
       </div>

@@ -7,6 +7,7 @@ import type { Profile, Project } from "@/lib/types";
 import { formatTimecode } from "@/lib/timecode";
 import HalftoneVideo from "../HalftoneVideo/HalftoneVideo";
 import styles from "./Hero.module.scss";
+import { Play } from "../Icon/Icon";
 
 const delay = (i: number) => ({ "--i": i }) as React.CSSProperties;
 
@@ -64,7 +65,7 @@ export default function Hero({ profile, background }: { profile: Profile; backgr
         <div className={styles.buttons}>
           {showreel && (
             <button type="button" className="btn btn-ghost" onClick={() => onPlay(showreel)}>
-              ▶ Шоурил
+              <Play /> Шоурил
             </button>
           )}
         </div>

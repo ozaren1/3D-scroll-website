@@ -15,7 +15,7 @@ const TABS = [
   { id: "works", label: "Работы" },
   { id: "categories", label: "Категории" },
   { id: "profile", label: "Обо мне" },
-  { id: "services", label: "Что я делаю" },
+  { id: "services", label: "Виды работ" },
   { id: "process", label: "Как идёт работа" },
   { id: "seo", label: "Страницы и SEO" },
 ] as const;

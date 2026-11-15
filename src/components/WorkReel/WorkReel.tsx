@@ -8,6 +8,7 @@ import { useCategories, useCategoryLabel } from "@/lib/categories";
 import type { Project, Service } from "@/lib/types";
 import { usePrefersReducedMotion } from "@/lib/useReveal";
 import styles from "./WorkReel.module.scss";
+import { ArrowRight, Play } from "../Icon/Icon";
 
 // The works as a vertical reel pinned to the screen while the page scrolls. Each work in turn
 // stops in place, large, with the others hidden, and its details slide out from under it to the
@@ -181,6 +182,28 @@ export default function WorkReel({ projects, services }: { projects: Project[]; 
     };
   }, [count, reduced]);
 
+  // Phones: the card fills the space between the heading (with the caption under it) and the
+  // services panel, so it never covers either. Their heights change with the work in front.
+  useEffect(() => {
+    const stage = stageRef.current;
+    const head = stage?.querySelector<HTMLElement>(`.${styles.head}`);
+    const rail = stage?.querySelector<HTMLElement>(`.${styles.rail}`);
+    if (!stage || !head || reduced) return;
+    const fit = () => {
+      stage.style.setProperty("--top", `${Math.round(head.offsetTop + head.offsetHeight)}px`);
+      stage.style.setProperty("--bottom", `${rail ? Math.round(rail.offsetHeight + 16) : 0}px`);
+    };
+    const observer = new ResizeObserver(fit);
+    observer.observe(head);
+    if (rail) observer.observe(rail);
+    fit();
+    return () => {
+      observer.disconnect();
+      stage.style.removeProperty("--top");
+      stage.style.removeProperty("--bottom");
+    };
+  }, [reduced, services.length]);
+
   // The front card starts playing once the reel settles on it, and only while the section is on screen.
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -305,7 +328,7 @@ export default function WorkReel({ projects, services }: { projects: Project[]; 
               <h3 className={styles.workTitle}>{frontProject.title}</h3>
               {frontProject.summary && <p className={styles.workSummary}>{frontProject.summary}</p>}
               <button type="button" className="btn btn-primary" onClick={() => onOpen(frontProject)}>
-                <span aria-hidden="true">▶</span> Смотреть со звуком
+                <Play /> Смотреть со звуком
               </button>
             </div>
           )}
@@ -317,7 +340,7 @@ export default function WorkReel({ projects, services }: { projects: Project[]; 
               aria-labelledby="services-title"
             >
               <h3 id="services-title" className={`${styles.railLabel} hud`}>
-                Что я делаю
+                Виды работ
               </h3>
               <ul ref={servicesRef} className={styles.services}>
                 {services.map((s, i) => (
@@ -334,16 +357,11 @@ export default function WorkReel({ projects, services }: { projects: Project[]; 
                   </li>
                 ))}
               </ul>
-              {service && (
-                <p className={styles.serviceText}>
-                  {service.text}
-                  {serviceCategory && (
-                    <>
-                      {" "}
-                      <Link href={`/works/${serviceCategory.slug}`}>Все работы: {serviceCategory.label} →</Link>
-                    </>
-                  )}
-                </p>
+              {service && <p className={styles.serviceText}>{service.text}</p>}
+              {serviceCategory && (
+                <Link className={styles.allWorks} href={`/works/${serviceCategory.slug}`}>
+                  Все работы: {serviceCategory.label} <ArrowRight />
+                </Link>
               )}
             </nav>
           )}
