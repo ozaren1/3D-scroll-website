@@ -25,6 +25,12 @@
   }
 }
 
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .text {
   font-size: var(--step-small);
   line-height: 1.45;
@@ -41,6 +47,14 @@
   .notice {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .actions {
+    flex-direction: row;
+
+    :global(.btn) {
+      flex: 1;
+    }
   }
 }
 

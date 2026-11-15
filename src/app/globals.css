@@ -73,6 +73,34 @@ html {
   background: var(--bg);
 }
 
+/* Cyberpunk cursor for mice and trackpads: a yellow chamfered arrow, and a cyan reticle over
+   anything clickable. Touch screens never show it; text fields keep the text cursor. */
+@media (pointer: fine) {
+  :root {
+    --cursor-default: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath d='M3 2v20l5.5-5.5 4 8.5 3.6-1.6-4-8.4H20z' fill='%23fcee0a' stroke='%230a0a0c' stroke-width='1.5' stroke-linejoin='round'/%3E%3Cpath d='M19 26h6v-6' fill='none' stroke='%2300f0ff' stroke-width='2'/%3E%3C/svg%3E") 3 2, auto;
+    --cursor-pointer: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg fill='none' stroke='%230a0a0c' stroke-width='4'%3E%3Cpath d='M4 11V4h7M21 4h7v7M28 21v7h-7M11 28H4v-7'/%3E%3C/g%3E%3Cg fill='none' stroke='%2300f0ff' stroke-width='2'%3E%3Cpath d='M4 11V4h7M21 4h7v7M28 21v7h-7M11 28H4v-7'/%3E%3C/g%3E%3Crect x='13' y='13' width='6' height='6' fill='%23fcee0a' stroke='%230a0a0c' stroke-width='1'/%3E%3C/svg%3E") 16 16, pointer;
+  }
+
+  html {
+    cursor: var(--cursor-default);
+  }
+
+  /* !important: component styles set cursor: pointer on their own buttons and links. */
+  a[href],
+  button:not(:disabled),
+  [role="button"],
+  label,
+  select,
+  summary {
+    cursor: var(--cursor-pointer) !important;
+  }
+
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  textarea {
+    cursor: text !important;
+  }
+}
+
 /* One shared ground for every section: a fine dot matrix and faint scanlines. */
 body {
   background-color: var(--bg);

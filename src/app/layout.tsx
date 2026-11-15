@@ -34,6 +34,11 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: siteUrl(),
     title: { default: name, template: `%s · ${profile.name}` },
     description: profile.tagline,
+    // Ownership checks for Google Search Console and Yandex Webmaster.
+    verification: {
+      google: "W9Hpoe2cUG-aPKSCxUnhOPyecutsVoway1lIcpdn_bw",
+      yandex: "4ce5f4dc438cf97a",
+    },
   };
 }
 

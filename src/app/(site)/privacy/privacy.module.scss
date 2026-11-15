@@ -55,3 +55,19 @@
 .updated {
   color: var(--muted);
 }
+
+// A button that reads like a link inside running text.
+.inlineButton {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--cyan);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--yellow);
+  }
+}

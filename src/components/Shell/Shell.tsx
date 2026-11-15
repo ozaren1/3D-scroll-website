@@ -9,11 +9,13 @@ import { useReveal } from "@/lib/useReveal";
 import BackToTop from "../BackToTop/BackToTop";
 import CookieNotice from "../CookieNotice/CookieNotice";
 import Footer from "../Footer/Footer";
+import Metrika from "../Metrika/Metrika";
 import Nav from "../Nav/Nav";
 import Player from "../Player/Player";
 
 // Everything every page of the site shares: navigation, footer, the video player,
-// the back-to-top button and the cookie notice.
+// the back-to-top button, the cookie notice and the analytics counter (only with consent).
+// The admin panel has its own layout, so it is never counted or recorded.
 export default function Shell({
   profile,
   categories,
@@ -35,6 +37,7 @@ export default function Shell({
       <Player project={playing} onClose={() => setPlaying(null)} />
       <BackToTop />
       <CookieNotice />
+      <Metrika />
     </PlayerContext.Provider>
     </CategoriesContext.Provider>
   );

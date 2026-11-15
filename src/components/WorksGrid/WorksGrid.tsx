@@ -2,9 +2,57 @@
 
 import clsx from "clsx";
 import Link from "next/link";
+import { useRef } from "react";
 import { usePlayer } from "@/lib/player";
 import type { Category, Project } from "@/lib/types";
+import { usePrefersReducedMotion } from "@/lib/useReveal";
+import { TiltCard } from "../TiltCard/TiltCard";
 import styles from "./WorksGrid.module.scss";
+
+// One work: the card leans towards the mouse and its video plays while the mouse is over it
+// (or the card has keyboard focus). Leaving reloads the video, which restores the poster and
+// stops the download. Touch screens just open the player.
+function WorkCard({ project, meta, onOpen }: { project: Project; meta: string; onOpen: () => void }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  const reduced = usePrefersReducedMotion();
+  const start = () => {
+    if (!reduced) ref.current?.play().catch(() => undefined);
+  };
+  const stop = () => ref.current?.load();
+
+  return (
+    <button
+      type="button"
+      className={styles.card}
+      onClick={onOpen}
+      onPointerEnter={(e) => e.pointerType === "mouse" && start()}
+      onPointerLeave={(e) => e.pointerType === "mouse" && stop()}
+      onFocus={(e) => e.currentTarget.matches(":focus-visible") && start()}
+      onBlur={stop}
+      aria-label={`Смотреть «${project.title}» со звуком`}
+    >
+      <TiltCard className={styles.tilt} max={8}>
+        <span className={styles.media}>
+          <video
+            ref={ref}
+            src={`${project.videoUrl}#t=0.5`}
+            poster={project.posterUrl ?? undefined}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+          />
+          <span className={styles.play} aria-hidden="true">
+            ▶
+          </span>
+        </span>
+      </TiltCard>
+      <span className={`${styles.meta} hud`}>{meta}</span>
+      <strong className={styles.cardTitle}>{project.title}</strong>
+      {project.summary && <span className={styles.summary}>{project.summary}</span>}
+    </button>
+  );
+}
 
 // All works, or the works of one category; the filter is a row of links to /works/<slug>.
 export default function WorksGrid({
@@ -63,32 +111,11 @@ export default function WorksGrid({
         <ul className={styles.grid}>
           {shown.map((project) => (
             <li key={project.id} className={clsx(project.orientation === "vertical" && styles.tall)}>
-              <button
-                type="button"
-                className={styles.card}
-                onClick={() => play(project)}
-                aria-label={`Смотреть «${project.title}» со звуком`}
-              >
-                <span className={styles.media}>
-                  {project.posterUrl ? (
-                    // Posters may live on the API host; plain <img> avoids configuring next/image domains.
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={project.posterUrl} alt="" loading="lazy" />
-                  ) : (
-                    <video src={`${project.videoUrl}#t=0.5`} muted playsInline preload="metadata" />
-                  )}
-                  <span className={styles.play} aria-hidden="true">
-                    ▶
-                  </span>
-                </span>
-                <span className={`${styles.meta} hud`}>
-                  {project.year}
-                  {labelOf(project.category) ? ` // ${labelOf(project.category)}` : ""}
-                  {project.client ? ` // ${project.client}` : ""}
-                </span>
-                <strong className={styles.cardTitle}>{project.title}</strong>
-                {project.summary && <span className={styles.summary}>{project.summary}</span>}
-              </button>
+              <WorkCard
+                project={project}
+                meta={[String(project.year), labelOf(project.category), project.client ?? ""].filter(Boolean).join(" // ")}
+                onOpen={() => play(project)}
+              />
             </li>
           ))}
         </ul>

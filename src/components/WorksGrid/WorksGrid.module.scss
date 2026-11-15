@@ -103,13 +103,18 @@
   }
 }
 
+.tilt {
+  width: 100%;
+  --tilt-clip: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+}
+
 .media {
   position: relative;
   display: block;
   aspect-ratio: 16 / 10;
   overflow: hidden;
   background: var(--panel);
-  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+  clip-path: var(--tilt-clip);
 
   img,
   video {
