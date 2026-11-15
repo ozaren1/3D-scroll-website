@@ -25,12 +25,12 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  // The halftone picture is bright: an even veil first, then deeper shade behind the text blocks.
+  // A light even veil, deeper where text sits (bottom, left, right).
   background:
-    linear-gradient(to top, rgba(10, 10, 12, 0.9) 0%, transparent 50%),
-    linear-gradient(to right, rgba(10, 10, 12, 0.65), transparent 45%),
-    linear-gradient(to left, rgba(10, 10, 12, 0.75), transparent 50%),
-    rgba(10, 10, 12, 0.45);
+    linear-gradient(to top, rgba(10, 10, 12, 0.8) 0%, transparent 45%),
+    linear-gradient(to right, rgba(10, 10, 12, 0.55), transparent 42%),
+    linear-gradient(to left, rgba(10, 10, 12, 0.6), transparent 48%),
+    rgba(10, 10, 12, 0.22);
 }
 
 .hudTop,
@@ -172,11 +172,11 @@
     padding-top: 84px;
   }
 
-  // On a phone the text runs over the whole picture, so the veil is even and dense.
+  // On a phone the text runs over the whole picture, so a light even veil backs up the text shadow.
   .shade {
     background:
-      linear-gradient(to top, rgba(10, 10, 12, 0.9) 0%, transparent 50%),
-      rgba(10, 10, 12, 0.68);
+      linear-gradient(to top, rgba(10, 10, 12, 0.85) 0%, transparent 45%),
+      rgba(10, 10, 12, 0.48);
   }
 
   .statement {

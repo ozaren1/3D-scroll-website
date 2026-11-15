@@ -34,7 +34,8 @@ void main() {
   vec2 center = (cell + 0.5) * u_cell;
   vec3 src = texture(u_tex, coverUv(center)).rgb;
   float lum = dot(src, vec3(0.299, 0.587, 0.114));
-  lum = smoothstep(0.06, 0.9, lum);
+  // Lifted midtones: dark footage still gives a full field of dots.
+  lum = pow(smoothstep(0.04, 0.9, lum), 0.75);
 
   float near = 1.0 - smoothstep(0.0, u_res.y * 0.35, distance(center, u_mouse));
   float radius = u_cell * 0.5 * clamp(sqrt(lum) * (0.92 + near * 0.5), 0.0, 1.05);
@@ -45,7 +46,9 @@ void main() {
   vec3 cyan = vec3(0.0, 0.941, 1.0);
   vec3 ink = mix(cyan * 0.85, yellow, smoothstep(0.35, 0.85, lum));
   float flicker = 0.93 + 0.07 * sin(u_time * 40.0 + cell.y * 1.7);
-  color = vec4(ink * dot * flicker, 1.0);
+  // Between the dots a dim copy of the picture instead of pure black, so the hero reads lighter.
+  vec3 ground = vec3(0.039, 0.039, 0.047) + src * 0.22;
+  color = vec4(mix(ground, ink * flicker, dot), 1.0);
 }`;
 
 function compile(gl: WebGL2RenderingContext, type: number, source: string) {

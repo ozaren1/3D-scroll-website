@@ -1,7 +1,6 @@
 import Contact from "@/components/Contact/Contact";
 import Hero from "@/components/Hero/Hero";
 import Process from "@/components/Process/Process";
-import Services from "@/components/Services/Services";
 import WorkSpiral from "@/components/WorkSpiral/WorkSpiral";
 import type { Metadata } from "next";
 import { loadContent } from "@/lib/api";
@@ -30,8 +29,7 @@ export default async function Home() {
   return (
     <>
       <Hero profile={profile} background={pickShowreel(profile, projects)} />
-      <WorkSpiral projects={projects} />
-      <Services projects={projects} services={services} />
+      <WorkSpiral projects={projects} services={services} />
       <Process steps={process} />
       <Contact profile={profile} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(personAndSite(profile)) }} />

@@ -102,11 +102,11 @@ export const processSteps = [
   { title: "Экспорт под площадки", time: "в день сдачи" },
 ];
 
-export const tools = ["Premiere Pro", "After Effects", "DaVinci Resolve", "Cinema 4D", "Blender"];
+export const tools = ["Premiere Pro", "After Effects", "DaVinci Resolve"];
 
 export const navLinks = [
   { href: "/works", label: "Работы" },
   { href: "/about", label: "Обо мне" },
-  { href: "/#services", label: "Услуги" },
+  { href: "/#work", label: "Услуги" },
   { href: "/#contact", label: "Контакты" },
 ];

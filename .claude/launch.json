@@ -1,6 +1,29 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "web", "runtimeExecutable": "npx", "runtimeArgs": ["next", "dev", "-p", "3001"], "port": 3001, "autoPort": false }
+    {
+      "name": "web",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "next",
+        "dev",
+        "-p",
+        "3001"
+      ],
+      "port": 3001,
+      "autoPort": false
+    },
+    {
+      "name": "web-prod",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "next",
+        "start",
+        "-p",
+        "3001"
+      ],
+      "port": 3001,
+      "autoPort": false
+    }
   ]
 }
