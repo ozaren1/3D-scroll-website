@@ -72,14 +72,14 @@ export default function ServicesAdmin() {
         <h1 className={styles.h1}>Что я делаю</h1>
         {items.length < 12 && (
           <button type="button" className="btn btn-ghost" onClick={() => setItems([...items, NEW_CARD])}>
-            + Добавить карточку
+            + Добавить услугу
           </button>
         )}
       </div>
       <p className={styles.muted}>
-        Услуги стоят рядом с каруселью работ на главной: подсвечивается услуга работы, которая сейчас впереди.
-        Работа услуги — выбранная, иначе работы её категории, иначе запасной. Ссылка «Все работы» ведёт на
-        страницу категории.
+        Услуги показываются на главной в блоке «Работы», справа от видео. Подсвечивается услуга, к которой
+        относится видео на экране; по клику на услугу лента прокручивается к её работе. Порядок здесь — порядок
+        на сайте (стрелки ↑ ↓).
       </p>
 
       <ol className={styles.cards}>
@@ -87,28 +87,20 @@ export default function ServicesAdmin() {
           <li key={i} className={`${styles.cardEdit} panel`}>
             <div className={styles.grid2}>
               <label className={styles.field}>
-                <span>Заголовок</span>
+                <span>Название услуги</span>
                 <input className={styles.input} value={s.title} required maxLength={80} onChange={(e) => update(i, { title: e.target.value })} />
               </label>
               <label className={styles.field}>
-                <span>Теги через запятую (до 6)</span>
-                <input
-                  className={styles.input}
-                  value={s.tags.join(", ")}
-                  onChange={(e) =>
-                    update(i, {
-                      tags: e.target.value
-                        .split(",")
-                        .map((t) => t.trimStart().slice(0, 24))
-                        .slice(0, 6),
-                    })
-                  }
-                />
+                <span>Категория работ этой услуги</span>
+                {categorySelect(s.categoryId, (id) => update(i, { categoryId: id }), "Без категории")}
+                <small className={styles.muted}>
+                  Работы этой категории подсвечивают услугу; ссылка «Все работы» ведёт на страницу категории.
+                </small>
               </label>
               <label className={styles.field}>
-                <span>Работа под карточкой</span>
+                <span>Работа-пример</span>
                 <select className={styles.input} value={s.projectId ?? ""} onChange={(e) => update(i, { projectId: toId(e.target.value) })}>
-                  <option value="">Автоматически — по категории</option>
+                  <option value="">Не выбрана — хватает категорий</option>
                   {projects.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.title}
@@ -116,19 +108,23 @@ export default function ServicesAdmin() {
                     </option>
                   ))}
                 </select>
-              </label>
-              <label className={styles.field}>
-                <span>Категория (ссылка «Все работы»)</span>
-                {categorySelect(s.categoryId, (id) => update(i, { categoryId: id }), "Без категории")}
+                <small className={styles.muted}>
+                  Эта работа всегда подсвечивает услугу, даже если она из другой категории.
+                </small>
               </label>
               <label className={styles.field}>
                 <span>Запасная категория</span>
                 {categorySelect(s.fallbackId, (id) => update(i, { fallbackId: id }), "Нет")}
+                <small className={styles.muted}>
+                  Если в основной категории пока нет работ, клик по услуге покажет работу отсюда. Если работ нет
+                  ни там, ни там, кнопка услуги на сайте бледная и не нажимается.
+                </small>
               </label>
             </div>
             <label className={styles.field}>
-              <span>Текст</span>
+              <span>Описание</span>
               <textarea className={styles.input} rows={2} maxLength={400} value={s.text} onChange={(e) => update(i, { text: e.target.value })} />
+              <small className={styles.muted}>Показывается под списком услуг, когда эта услуга подсвечена.</small>
             </label>
             <div className={styles.rowActions}>
               <button type="button" onClick={() => move(i, -1)} disabled={i === 0} aria-label="Выше">
@@ -138,7 +134,7 @@ export default function ServicesAdmin() {
                 ↓
               </button>
               <button type="button" className={styles.danger} onClick={() => setItems(items.filter((_, j) => j !== i))}>
-                Удалить карточку
+                Удалить услугу
               </button>
             </div>
           </li>
@@ -152,7 +148,7 @@ export default function ServicesAdmin() {
       )}
       <div className={styles.formActions}>
         <button type="submit" className="btn btn-primary" disabled={busy}>
-          {busy ? "Сохраняю…" : "Сохранить карточки"}
+          {busy ? "Сохраняю…" : "Сохранить услуги"}
         </button>
       </div>
     </form>

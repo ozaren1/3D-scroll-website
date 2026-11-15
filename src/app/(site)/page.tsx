@@ -1,7 +1,7 @@
 import Contact from "@/components/Contact/Contact";
 import Hero from "@/components/Hero/Hero";
 import Process from "@/components/Process/Process";
-import WorkSpiral from "@/components/WorkSpiral/WorkSpiral";
+import WorkReel from "@/components/WorkReel/WorkReel";
 import type { Metadata } from "next";
 import { loadContent } from "@/lib/api";
 import { canonical } from "@/lib/site";
@@ -29,7 +29,7 @@ export default async function Home() {
   return (
     <>
       <Hero profile={profile} background={pickShowreel(profile, projects)} />
-      <WorkSpiral projects={projects} services={services} />
+      <WorkReel projects={projects} services={services} />
       <Process steps={process} />
       <Contact profile={profile} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(personAndSite(profile)) }} />
